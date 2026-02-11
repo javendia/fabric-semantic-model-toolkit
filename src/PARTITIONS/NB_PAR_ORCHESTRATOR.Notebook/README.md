@@ -30,8 +30,8 @@ El cuaderno **NB_PAR_ORCHESTRATOR** es el orquestador principal del flujo de tra
     "first_date": "20200101",
     "partition_by": "Order Date",
     "interval": "QUARTER",
-    "refresh_from": "20250101",
-    "number_of_intervals": "*"
+    "last_date": "20250101",
+    "intervals_to_refresh": "*"
   }
 ]
 ```
@@ -42,8 +42,8 @@ El cuaderno **NB_PAR_ORCHESTRATOR** es el orquestador principal del flujo de tra
 | `first_date` | string | Fecha inicial de particionamiento (formato YYYYMMDD) | `"20200101"` |
 | `partition_by` | string | Nombre de la columna de fecha para particionar | `"Order Date"` |
 | `interval` | string | Intervalo de particionamiento | `"MONTH"`, `"QUARTER"`, `"YEAR"` |
-| `refresh_from` | string | Fecha desde la cual refrescar hacia atrás (YYYYMMDD). Si el valor es `"TODAY"`, se usa la fecha actual | `"20250101"` |
-| `number_of_intervals` | string | Cuántos períodos incluir. Si el valor es *, refresca todos los períodos disponibles | `"4"` |
+| `last_date` | string | Fecha final de particionamiento o partir de la cual refrescar (formato YYYYMMDD) | `"20250101"` |
+| `intervals_to_refresh` | string | Cuántos períodos incluir. Si el valor es *, refresca todos los períodos disponibles | `"4"` |
 
 ### Parámetros de particionamiento
 
@@ -85,16 +85,16 @@ El cuaderno **NB_PAR_ORCHESTRATOR** es el orquestador principal del flujo de tra
 flowchart TD
   A["🟢 INICIO<br/>Validación de parámetros"] --> B{¿enable_partition<br/>activo?}
   B -->|Sí| C["📌 Ejecutar NB_PAR_PARTITIONER<br/>(Crear particiones)"]
-  B -->|No| D["⏭️ Particionar deshabilitado"]
+  B -->|No| D["⏭️ Particionamiento deshabilitado"]
   C --> E{¿Particionamiento<br/>con éxito?}
   C -->|No| X["❌ Error crítico<br/>Abortar ejecución"]
   C -->|Sí| F{¿enable_refresh<br/>activo?}
   D --> F
-  F -->|No| Z["✅ FIN<br/>Refresco deshabilitado"]
+  F -->|No| Z["✅ FIN<br/>"]
   F -->|Sí| G{¿partitions_to_refresh<br/>proporcionado?}
   G -->|Sí| H["📋 Usar partitions_to_refresh<br/>explícito"]
   G -->|No| I{¿partitions_config<br/>proporcionado?}
-  I -->|Sí| J["📊 Generar lista de particiones<br/>(generate_partitions_list)"]
+  I -->|Sí| J["📊 Generar lista de particiones<br/>generate_partitions_list()"]
   I -->|No| K["🔄 Refrescar todas<br/>las particiones"]
   J --> L{¿Generación<br/>con éxito?}
   L -->|No| X
@@ -106,13 +106,13 @@ flowchart TD
   O -->|Sí| Z
   X --> END["⛔ Fin con error"]
   Z --> END2["✅ Fin con éxito"]
-  style A fill:#90EE90
-  style Z fill:#87CEEB
-  style END2 fill:#87CEEB
-  style X fill:#FFB6C6
-  style END fill:#FFB6C6
-  style C fill:#FFE4B5
-  style N fill:#FFE4B5
+  style A fill:#90EE90,color:#000
+  style Z fill:#87CEEB,color:#000
+  style END2 fill:#87CEEB,color:#000
+  style X fill:#FFB6C6,color:#000
+  style END fill:#FFB6C6,color:#000
+  style C fill:#FFE4B5,color:#000
+  style N fill:#FFE4B5,color:#000
 ```
 
 ---
@@ -121,10 +121,14 @@ flowchart TD
 
 ### Bibliotecas externas
 
-- **pandas**: Manipulación de DataFrames
-- **datetime**: Cálculos de fechas
-- **logging**: Sistema de logging
-- **notebookutils**: Paquete integrado para llevar a cabo tareas comunes en cuadernos de Microsoft Fabric
+- **pandas**: Manipulación de DataFrames.
+- **datetime**: Cálculos de fechas.
+- **typing**: Tipos (Optional, Any, Dict).
+- **logging**: Sistema de logging.
+- **notebookutils**: Paquete integrado para llevar a cabo tareas comunes en cuadernos de Microsoft Fabric.
+- **StringIO**: Manejo de strings como archivos.
+- **uuid**: Generación de identificadores únicos.
+- **numpy**: Operaciones numéricas y manejo de arrays.
 
 ### fabtoolkit
 
@@ -138,7 +142,7 @@ from fabtoolkit.utils import (
     validate_json,                # Analizar y validar JSON
     Constants
 )
-from fabtoolkit.log import ConsoleFormatter    # Formato de logging personalizadosemánticos
+from fabtoolkit.log import ConsoleFormatter    # Formato de logging personalizado
 ```
 
 **Versión de fabtoolkit:** `1.0.0`
@@ -147,30 +151,54 @@ from fabtoolkit.log import ConsoleFormatter    # Formato de logging personalizad
 
 ## 📈 Ejemplo de ejecución
 
-### Configuración mínima (Refrescar todo)
-```python
-enable_partition = False
-partitions_config = ''
-enable_refresh = True
-tables_to_refresh = "Sales,Customer"
-partitions_to_refresh = ""
-```
-
-### Configuración avanzada (Particionar + Refresco selectivo)
+### 1. Solo particionar hasta la fecha actual
 ```python
 enable_partition = True
-partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER"}]'
+partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "TODAY", "intervals_to_refresh": "*"}]'
+enable_refresh = False
+```
+
+### 2. Particionar hasta una determinada fecha y refrescar todos los períodos
+```python
+enable_partition = True
+partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "*"}]'
 enable_refresh = True
-refresh_max_parallelism = 4
+tables_to_refresh = ""
+partitions_to_refresh = ""
 refresh_commit_mode = "transactional"
-refresh_notebook_timeout = 3600
+refresh_max_parallelism = 6
+notebook_timeout = 7200
+```
+
+### 3. Solo refrescar algunas tablas y un rango de particiones específico
+```python
+enable_partition = False
+partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "4"}]'
+enable_refresh = True
+tables_to_refresh = "Customer,Sales"
+partitions_to_refresh = ""
+refresh_commit_mode = "transactional"
+refresh_max_parallelism = 6
+notebook_timeout = 7200
+```
+
+### 4. Solo refrescar particiones específicas
+```python
+enable_partition = False
+partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "*"}]'
+enable_refresh = True
+tables_to_refresh = ""
+partitions_to_refresh = '[{"table": "Sales", "selected_partitions": "Sales_20200101_20200331,Sales_20200401_20200630"}]'
+refresh_commit_mode = "transactional"
+refresh_max_parallelism = 4
+notebook_timeout = 7200
 ```
 
 ---
 
 ## 🔗 Cuadernos relacionados
 
-- [**NB_PAR_PARTITIONER**](./NB_PAR_PARTITIONER.Notebook/README.md): Genera particiones dinámicamente en función de criterios de fecha personalizables
-- [**NB_PAR_REFRESHER**](./NB_PAR_REFRESHER.Notebook/README.md): Ejecuta el refresco del conjunto de datos para un grupo de tablas / particiones especificadas
+- [**NB_PAR_PARTITIONER**](./NB_PAR_PARTITIONER.Notebook/README.md): Genera particiones dinámicamente en función de criterios de fecha personalizables.
+- [**NB_PAR_REFRESHER**](./NB_PAR_REFRESHER.Notebook/README.md): Ejecuta el refresco del conjunto de datos para un grupo de tablas / particiones especificadas.
 
 ---

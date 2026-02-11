@@ -101,12 +101,19 @@ def get_tables(dataset: Dataset, tables_to_refresh: Optional[str]) -> pd.DataFra
         logger.info(f"Tables to refresh provided: {table_list}")
         
         # Check if the provided tables exist in the dataset
-        invalid_tables: List[str] = list(set(table_list) - set(available_tables))
-        if invalid_tables:
-            raise ValueError(f"Invalid table names provided: {invalid_tables}")
         
-        # Get related tables
-        tables: pd.DataFrame = dataset.get_related_tables(table_list)
+        invalid_tables: List[str] = list(set(table_list) - set(available_tables))
+        valid_tables: List[str] = []
+        if invalid_tables:
+            valid_tables =  list(set(table_list) - set(invalid_tables))
+            if not valid_tables:
+                raise ValueError("All provided tables to refresh are invalid.")
+            logger.warning(f"Invalid table names provided: {invalid_tables}")
+        else:
+            valid_tables = table_list
+        
+        # Get related tables for selected tables, excluding invalid ones
+        tables: pd.DataFrame = dataset.get_related_tables(list(set(table_list) - set(invalid_tables)))
         logger.info(f"Tables to refresh: {tables['table_name'].tolist()}")
         return tables
     else:
@@ -143,8 +150,7 @@ def get_partitions(dataset: Dataset, tables: pd.DataFrame, partitions_to_refresh
     # Get partitions for each table to refresh
     available_partitions: pd.DataFrame = tables.merge(
         dataset.partitions,
-        left_on=["table_name"],
-        right_on=["table_name"],
+        on=["table_name"],
         how="inner"
     )[["table_name", "partition_name"]]
 
@@ -152,60 +158,56 @@ def get_partitions(dataset: Dataset, tables: pd.DataFrame, partitions_to_refresh
         logger.info("No explicit partitions to refresh. Refreshing all partitions...")
         return available_partitions
     else:
-        # Merge tables to identify tables with selected partitions for refresh
-        selected_tables: pd.DataFrame = pd.read_json(StringIO(partitions_to_refresh)).merge(
-            available_partitions,
-            left_on=["table"],
-            right_on=["table_name"],
-            how="left",
-            indicator=True
+        # Parse and explode selected partitions
+        selected_partitions: pd.DataFrame = (
+            pd.read_json(StringIO(partitions_to_refresh))
+            .assign(partition=lambda x: x["selected_partitions"].str.split(','))
+            .explode("partition", ignore_index=True)
+            .assign(partition=lambda x: x["partition"].str.strip())
         )
 
         # If any of the tables with selected partitions are not available
-        invalid_tables = selected_tables[selected_tables["_merge"] == "left_only"]
+        selected_partitions["is_valid_table"] = selected_partitions["table"].isin(available_partitions["table_name"])
+        invalid_tables = selected_partitions[~selected_partitions["is_valid_table"]]
         if not invalid_tables.empty:
-            logger.warning(f"The following tables, for which partitions were selected, are not available: {invalid_tables['table'].tolist()}")
+            logger.warning(f"The following tables, for which partitions were selected, are not selected: {invalid_tables['table'].unique().tolist()}")
         
-        # Tables with selected partitions
-        tables_with_selected_part = selected_tables[selected_tables["_merge"] == "both"]
+        # Valid tables with explicit partitions to refresh
+        selected_partitions = selected_partitions[selected_partitions["is_valid_table"]]
 
-        if tables_with_selected_part.empty:
+        # If none of the tables with selected partitions are available, return all current partitions
+        if selected_partitions.empty:
             return available_partitions
 
-        # Parse and explode selected partitions
-        selected_partitions: pd.DataFrame = (
-            tables_with_selected_part[["table_name", "selected_partitions"]].drop_duplicates()
-            .assign(partition_name=lambda x: x['selected_partitions'].str.split(','))
-            .explode('partition_name', ignore_index=True)
-            .assign(partition_name=lambda x: x['partition_name'].str.strip())
-        )
-    
-        # Merge current partitions with selected partitions to determine which to refresh
-        valid_partitions: pd.DataFrame = selected_partitions[["table_name", "partition_name"]].merge(
-            tables_with_selected_part[["table_name", "partition_name"]],
+        # Identify the available tables for which partitions have been selected
+        available_partitions["table_with_selected_partitions"] = available_partitions["table_name"].isin(selected_partitions["table"])
+        
+        # Outer merge to find: (1) valid partitions, (2) invalid partitions requested
+        valid_partitions: pd.DataFrame = available_partitions.merge(
+            selected_partitions[["table", "partition"]],
             left_on=["table_name", "partition_name"],
-            right_on=["table_name", "partition_name"],
-            how="left",
+            right_on=["table", "partition"],
+            how="outer",
             indicator=True
         )
 
         # If any of the selected partitions do not match the available partitions for the table
-        invalid_partitions = valid_partitions[valid_partitions["_merge"] == "left_only"]
+        invalid_partitions = valid_partitions[valid_partitions["_merge"] == "right_only"]
         if not invalid_partitions.empty:
-            raise ValueError(f"Invalid partitions found:\n{invalid_partitions[['table_name', 'partition_name']].to_json(orient='records')}")
+            logger.warning(f"Invalid partitions found:\n{invalid_partitions[['table', 'partition']].to_json(orient='records')}")
 
-        # Partitions to be refreshed not explicitly selected (related tables)
-        table_partitions_no_selected: pd.DataFrame = selected_tables[selected_tables["_merge"] == "left_only"]
-        # Partitions to be refreshed explicitly selected
-        table_partitions_selected: pd.DataFrame = (
-            valid_partitions[valid_partitions["_merge"] == "both"]
-        )
-
-        partitions: pd.DataFrame = pd.concat(
-            [table_partitions_no_selected[["table_name", "partition_name"]], table_partitions_selected[["table_name", "partition_name"]]], 
-            ignore_index=True
-        )
+        # Partitions to be refreshed
+        # 1. All partitions from related tables without selected partitions
+        # 2. Partitions from tables with selected partitions
+        partitions = valid_partitions[
+            (
+                (valid_partitions["_merge"] == "left_only")
+                & (valid_partitions["table_with_selected_partitions"] == False)
+            )
+            | (valid_partitions["_merge"] == "both")
+        ][["table_name", "partition_name"]]
         logger.info(f"Partitions to refresh: {partitions.to_json(orient='records')}")
+        
         return partitions
 
 # METADATA ********************

@@ -12,9 +12,9 @@ El cuaderno **NB_PAR_PARTITIONER** es responsable de la **creación de particion
 
 | Parámetro | Tipo | Descripción | Ejemplo |
 |-----------|------|-------------|---------|
-| `workspace_id` | string | GUID del área de trabajo de Microsoft Fabric | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
-| `dataset_id` | string | GUID del modelo semántico de Power BI | `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
-| `partitions_config` | string (JSON) | Configuración de particiones a crear | Ver tabla abajo |
+| `workspace_id` | string | GUID del área de trabajo de Microsoft Fabric. | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
+| `dataset_id` | string | GUID del modelo semántico de Power BI.| `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
+| `partitions_config` | string (JSON) | Configuración de particiones a crear. | Ver tabla abajo |
 
 **Ejemplo de `partitions_config`:**
 ```json
@@ -23,13 +23,8 @@ El cuaderno **NB_PAR_PARTITIONER** es responsable de la **creación de particion
     "table": "Sales",
     "first_date": "20200101",
     "partition_by": "Order Date",
-    "interval": "QUARTER"
-  },
-  {
-    "table": "Customer",
-    "first_date": "20200101",
-    "partition_by": "Create Date",
-    "interval": "YEAR"
+    "interval": "QUARTER",
+    "last_date": "20250101"
   }
 ]
 ```
@@ -40,12 +35,14 @@ El cuaderno **NB_PAR_PARTITIONER** es responsable de la **creación de particion
 | `first_date` | string | Fecha inicial de particionamiento (formato YYYYMMDD) | `"20200101"` |
 | `partition_by` | string | Nombre de la columna de fecha para particionar | `"Order Date"` |
 | `interval` | string | Intervalo de particionamiento | `MONTH`, `QUARTER`, `YEAR` |
+| `last_date` | string | Fecha final de particionamiento (formato YYYYMMDD) | `"20250101"` |
 
 El cuaderno valida automáticamente:
-- ✅ Que todas las entidades en `partitions_config` existan en el modelo semántico
-- ✅ Que todas las columnas `partition_by` sean válidas
-- ✅ Que `first_date` esté en formato YYYYMMDD
-- ✅ Que `interval` sea un valor válido (`MONTH`, `QUARTER` o `YEAR`)
+- ✅ Que todas las entidades en `partitions_config` existan en el modelo semántico.
+- ✅ Que todas las columnas `partition_by` sean válidas.
+- ✅ Que `first_date` esté en formato YYYYMMDD.
+- ✅ Que `last_date` esté en formato YYYYMMDD.
+- ✅ Que `interval` sea un valor válido (`MONTH`, `QUARTER` o `YEAR`).
 
 ---
 
@@ -55,13 +52,13 @@ El cuaderno valida automáticamente:
 flowchart TD
     A["🟢 INICIO<br/>partition()"] --> B["📊 Crear instancia Dataset<br/>Obtener el nombre del área de trabajo, el nombre del modelo semántico y las particiones existentes"]
     
-    B --> C["✅ Validar configuración<br/>_validate_params<br/>- Analizar JSON<br/>- Verificar entidades en el modelo semántico<br/>- Verificar columnas de particionamiento<br/>- Validar fechas e intervalos"]
+    B --> C["✅ Validar configuración"]
     
     C --> D{¿Validación<br/>con éxito?}
     D -->|No| X["❌ Error validación<br/>Mostrar detalles<br/>Abortar"]
     D -->|Sí| E["🔄 Para cada tabla<br/>en la configuración"]
     
-    E --> F["📋 Generar intervalos de fechas<br/>generate_partition_ranges<br/>Generar lista de fechas de inicio y fin entre la fecha proporcionada y la fecha actual"]
+    E --> F["📋 Generar intervalos de fechas"]
     
     F --> G["📝 Crear nombres de particiones<br/>Formato: table_YYYYMMDD_YYYYMMDD<br/>Ej: Sales_20200101_20200331"]
     
@@ -74,19 +71,19 @@ flowchart TD
     J --> K
     
     K -->|No| L["ℹ️ Todas las particiones<br/>ya existen"]
-    K -->|Sí| M["📄 Extraer la consulta original<br/>dataset.extract_query_definition<br/>- Obtener último paso"]
+    K -->|Sí| M["Extraer la consulta original<br/>Obtener último paso"]
     
-    M --> N["🔧 Generar consultas M<br/>format_query_definition<br/>"]
+    M --> N["🔧 Generar consultas M"]
     
-    N --> O["💾 Crear particiones M<br/>dataset.create_m_partitions<br/>"]
+    N --> O["💾 Crear particiones"]
     
     O --> P{¿Creación<br/>con éxito?}
     P -->|No| X
-    P -->|Sí| Q["✅ Log: Particiones creadas"]
+    P -->|Sí| Q["✅ Particiones creadas"]
     
     Q --> R{¿Existe la partición<br/>por defecto?<br/>tabla == partition_name}
     
-    R -->|Sí| S["🗑️ Eliminar partición<br/>por defecto<br/>dataset.delete_default_partition"]
+    R -->|Sí| S["🗑️ Eliminar partición por defecto"]
     R -->|No| T["ℹ️ Sin partición<br/>por defecto"]
     
     S --> U{¿Más entidades?}
@@ -99,14 +96,14 @@ flowchart TD
     V --> END["✅ Fin con éxito"]
     X --> END2["⛔ Fin con error"]
     
-    style A fill:#90EE90
-    style V fill:#87CEEB
-    style END fill:#87CEEB
-    style X fill:#FFB6C6
-    style END2 fill:#FFB6C6
-    style C fill:#FFE4B5
-    style F fill:#FFE4B5
-    style O fill:#FFE4B5
+    style A fill:#90EE90,color:#000
+    style V fill:#87CEEB,color:#000
+    style END fill:#87CEEB,color:#000
+    style X fill:#FFB6C6,color:#000
+    style END2 fill:#FFB6C6,color:#000
+    style C fill:#FFE4B5,color:#000
+    style F fill:#FFE4B5,color:#000
+    style O fill:#FFE4B5,color:#000
 ```
 
 ---
@@ -115,11 +112,12 @@ flowchart TD
 
 ### Bibliotecas externas
 
-- **pandas**: Manipulación de DataFrames
-- **datetime**: Cálculos de fechas
-- **typing**: Tipos (Dict, List)
-- **logging**: Sistema de logging
-- **json**: Manejo de estructuras JSON
+- **pandas**: Manipulación de DataFrames.
+- **datetime**: Cálculos de fechas.
+- **typing**: Tipos (Dict, List).
+- **logging**: Sistema de logging.
+- **sys**: Manejo de excepciones y salida del programa.
+- **StringIO**: Manejo de strings como archivos.
 
 ### fabtoolkit
 
@@ -149,7 +147,8 @@ from fabtoolkit.dataset import Dataset         # Clase para operaciones sobre mo
     "table": "Sales",
     "first_date": "20200101",
     "partition_by": "Order Date",
-    "interval": "QUARTER"
+    "interval": "QUARTER",
+    "last_date": "20250101"
   }
 ]
 ```
@@ -171,13 +170,15 @@ Sales_20251001_20251231  (Q4 2025)
     "table": "Sales",
     "first_date": "20200101",
     "partition_by": "Delivery Date",
-    "interval": "QUARTER"
+    "interval": "QUARTER",
+    "last_date": "20250101"
   },
   {
     "table": "Orders",
     "first_date": "20250101",
     "partition_by": "Order Date",
-    "interval": "MONTH"
+    "interval": "MONTH",
+    "last_date": "20251231"
   }
 ]
 ```
@@ -188,19 +189,19 @@ Sales_20251001_20251231  (Q4 2025)
 
 ### Generación de intervalo de fechas
 
-- El intervalo se calcula hasta el **último día del período actual**:
-  - Si el intervalo es `YEAR`: hasta el final del año actual
-  - Si el intervalo es `QUARTER`: hasta el final del trimestre actual
-  - Si el intervalo es `MONTH`: hasta el final del mes actual
+- El intervalo se calcula hasta el **último día del período para el valor de `last_date`**:
+  - Si el intervalo es `YEAR`: hasta el final del año para el valor de `last_date`.
+  - Si el intervalo es `QUARTER`: hasta el final del trimestre para el valor de `last_date`.
+  - Si el intervalo es `MONTH`: hasta el final del mes para el valor de `last_date`.
 
 ### Eliminación de partición por defecto
 
-- Generalmente, por defecto, Power BI crea una partición que abarca todos los datos, cuyo nombre coincide con la entidad
-- Una vez añadidas las particiones necesarias, esta partición se elimina en caso de que exista
+- Generalmente, por defecto, Power BI crea una partición que abarca todos los datos, cuyo nombre coincide con la entidad.
+- Una vez añadidas las particiones necesarias, esta partición se elimina en caso de que exista.
 
 ### Construcción de consultas M para particiones
 
 - Se preserva la consulta original (transformaciones, uniones, etc.)
-- Se agrega un paso adicional `Table.SelectRows` para filtrar por un intervalo de fechas específico
+- Se agrega un paso adicional `Table.SelectRows` para filtrar por un intervalo de fechas específico.
 
 ---

@@ -145,6 +145,7 @@ def _validate_partitions_config(dataset: Dataset, partitions_config: str) -> pd.
 def generate_partition_ranges(
     table: str, 
     first_date: str,
+    last_date: str,
     interval: str
 ) -> pd.DataFrame:
     """
@@ -153,6 +154,7 @@ def generate_partition_ranges(
     Args:
         table (str): Name of the table for which partitions are being generated.
         first_date (str): The starting date for partitioning.
+        last_date (str): The ending date for partitioning.
         interval (str): The interval for partitioning (YEAR, QUARTER, MONTH).
 
     Returns:
@@ -166,19 +168,24 @@ def generate_partition_ranges(
     interval_def = Constants.INTERVALS[Interval(interval.upper())]
     end_interval: str = interval_def.end_interval
     first_date_dt = datetime.strptime(str(first_date), DATE_FORMAT).date()
-    end_date = pd.Period(datetime.today(), freq=end_interval).to_timestamp(how="end").date()
+    end_period_frequencies = {'YE': 'Y', 'QE': 'Q', 'ME': 'M'}
+    end_date = pd.Period(
+        datetime.strptime(str(last_date), DATE_FORMAT),
+        freq=end_period_frequencies[end_interval]
+    ).to_timestamp(how="end").date()
     
     # Generate date ranges
     try:
         logger.info(f"Generating dates list between {first_date_dt} and {end_date} with {interval} interval...")
-        new_partitions: pd.DataFrame = generate_date_ranges(first_date_dt, end_date, interval).assign(
-            table_name=table
-        )
+        
+        new_partitions: pd.DataFrame = generate_date_ranges(first_date_dt, end_date, interval).assign(table_name=table)
+        # Generate partition names (format: TableName_yyyyMMdd_yyyyMMdd)
         new_partitions["partition_name"] = (
             new_partitions["table_name"] + "_" + 
             pd.to_datetime(new_partitions["range_start"]).dt.strftime(DATE_FORMAT) + "_" + 
             pd.to_datetime(new_partitions["range_end"]).dt.strftime(DATE_FORMAT)
         )
+        
         logger.info(f"Successfully generated {len(new_partitions)} partition(s) for {table}")
     except Exception as e:
         logger.error(f"Error generating date ranges: {str(e)}")
@@ -246,9 +253,9 @@ def partition() -> None:
         try:
             logger.info(f"Creating partitions for '{row.table}' in the '{dataset_name}' dataset within the '{workspace_name}' workspace.")
 
-            new_partitions = generate_partition_ranges(row.table, row.first_date, row.interval).assign(
-                partition_by=row.partition_by
-            )
+            new_partitions = generate_partition_ranges(
+                row.table, row.first_date, row.last_date, row.interval
+            ).assign(partition_by=row.partition_by)
 
             # Filter partitions of the table being processed
             table_partitions: pd.DataFrame = current_partitions[current_partitions["table_name"]==row.table]
@@ -261,8 +268,7 @@ def partition() -> None:
             # Merge and create new partitions if needed
             pending_partitions = new_partitions.merge(
                 table_partitions[["table_name", "partition_name"]], 
-                left_on=["table_name", "partition_name"], 
-                right_on=["table_name", "partition_name"], 
+                on=["table_name", "partition_name"],
                 how="left", 
                 indicator=True
             )
@@ -277,6 +283,7 @@ def partition() -> None:
                     lambda row: format_query_definition(base_query, last_step, row),
                     axis=1,
                 )
+                
                 dataset.create_m_partitions(pending_partitions)
                 logger.info(f"Created partitions: {pending_partitions['partition_name'].tolist()}")
             else:

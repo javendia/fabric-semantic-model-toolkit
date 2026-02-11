@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 
-Repositorio de la ponencia **"Actualiza solo lo que importa: Particiones inteligentes en Power BI"**  
+Repositorio de la ponencia **"Salvar al soldado Power BI: particiones y refrescos eficientes"**  
 **Evento:** Global Power Platform Bootcamp 2026 (Alicante)
 
 ---
@@ -20,8 +20,8 @@ La estructura del repositorio es la siguiente:
 gppb2026/
 ├── /doc/                                   # Documentación adicional
 ├── /lib/                                   # Librerías personalizadas
-├── /resources/                             # Recursos adicionales (imágenes, ejemplos, etc.)
     ├── fabtoolkit-1.0.0-py3-none-any.whl   # Conjunto de utilidades para trabajar con Microsoft Fabric
+├── /resources/                             # Recursos adicionales (imágenes, ejemplos, etc.)
 ├── /src/                                   # Código fuente de la solución
 │   ├── NB_PAR_ORCHESTRATOR.Notebook        # Orquestador principal
 │   ├── NB_PAR_PARTITIONER.Notebook         # Particionamiento

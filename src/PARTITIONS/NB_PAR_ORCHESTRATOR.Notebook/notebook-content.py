@@ -32,14 +32,14 @@ notebook_timeout: int = 7200
 
 # CELL ********************
 
-import pandas as pd
 from datetime import datetime
 from typing import Optional, Any, Dict
-import logging
 import sys
+import logging
 import notebookutils
 from io import StringIO
 import uuid
+import numpy as np
 
 # METADATA ********************
 
@@ -89,6 +89,7 @@ from fabtoolkit.utils import (
     Constants
 )
 from fabtoolkit.log import ConsoleLogFormatter
+import pandas as pd
 
 # METADATA ********************
 
@@ -180,8 +181,17 @@ def validate_params(
     
     # Validate partitions_config JSON
     if (enable_partition or enable_refresh) and is_valid_text(partitions_config):
-        columns = ["table", "first_date", "partition_by", "interval", "refresh_from", "number_of_intervals"]
-        validate_json(partitions_config, columns)
+        columns = ["table", "first_date", "partition_by", "interval", "last_date", "intervals_to_refresh"]
+        
+        partitions_config_df: pd.DataFrame = validate_json(partitions_config, columns)
+        
+        # Parse last_date value if needed
+        partitions_config_df["last_date"] = np.where(
+            partitions_config_df["last_date"] == "TODAY",
+            datetime.strftime(datetime.today(), DATE_FORMAT),
+            partitions_config_df["last_date"]
+        )
+        partitions_config = partitions_config_df.to_json(orient="records")
         
     if enable_refresh:
         # Validate tables_to_refresh
@@ -253,33 +263,25 @@ def generate_partitions_list(partitions_config: pd.DataFrame) -> str:
     Raises:
         Exception: If any step in the process fails.
     """
-    
-    date_format = Constants.DATE_FORMAT
+
     date_ranges = []
     
     for row in partitions_config.itertuples():
 
         logger.info("Calculating bounds for each table...")
-        
         try:
-            first_date: datetime = datetime.strptime(str(row.first_date), date_format)
-
-            # Determine refresh_from date
-            if row.refresh_from == "TODAY":
-                refresh_from: datetime = datetime.today()
-            else:
-                refresh_from: datetime = datetime.strptime(str(row.refresh_from), date_format)
+            first_date: datetime = datetime.strptime(str(row.first_date), DATE_FORMAT)
+            refresh_from: datetime = datetime.strptime(str(row.last_date), DATE_FORMAT)
 
             start_date, end_date = get_bounds_from_offset(
                 first_date,
                 refresh_from,
                 row.interval,
-                row.number_of_intervals
+                row.intervals_to_refresh
             )
-            logger.info("Generating date ranges for each table...")
             
-            # Generates a list of date ranges with the interval used to create table partitions.
-            date_range = generate_date_ranges(start_date, end_date, row.interval).assign(table=row.table)
+            logger.info("Generating date ranges for each table...")
+            date_range: pd.DataFrame = generate_date_ranges(start_date, end_date, row.interval).assign(table=row.table)
             date_ranges.append(date_range)
         except Exception as e:
             logger.error(f"Unable to calculate bounds for partitions: {str(e)}")
@@ -290,8 +292,8 @@ def generate_partitions_list(partitions_config: pd.DataFrame) -> str:
     
     try:
         # Generating partitions list like Table_yyyyMMdd_yyyyMM_dd
-        partitions["range_start"] = pd.to_datetime(partitions["range_start"]).dt.strftime(date_format)
-        partitions["range_end"] = pd.to_datetime(partitions["range_end"]).dt.strftime(date_format)
+        partitions["range_start"] = pd.to_datetime(partitions["range_start"]).dt.strftime(DATE_FORMAT)
+        partitions["range_end"] = pd.to_datetime(partitions["range_end"]).dt.strftime(DATE_FORMAT)
         partitions["partition"] = partitions.apply(
             lambda row: f"{row['table']}_{row['range_start']}_{row['range_end']}", axis=1
         )
@@ -300,9 +302,10 @@ def generate_partitions_list(partitions_config: pd.DataFrame) -> str:
             partitions.groupby("table", as_index=False)
             .agg(selected_partitions=("partition", lambda x: ",".join(x)))
         )
-        
         objects = partitions_agg.to_json(orient="records")
+        
         logger.info("List of partitions to refresh created successfully.")
+        
         return objects
     except Exception as e:
         logger.error(f"Unable to format or aggregate partition data: {str(e)}")
@@ -380,7 +383,6 @@ def run():
             logger.error("Partitions configuration is required for partitioning.")
             raise ValueError("Partitions configuration is required for partitioning.")
         
-        # Create partitions
         run_notebook(
             PARTITIONER_NOTEBOOK_NAME,
             params["notebook_timeout"],

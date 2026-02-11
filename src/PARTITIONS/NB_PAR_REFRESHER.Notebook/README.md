@@ -28,15 +28,17 @@ El cuaderno **NB_PAR_REFRESHER** es responsable de la **ejecución controlada de
 
 #### `tables_to_refresh`
 
-- **Formato:** Cadena con nombres de entidades separados por comas
+- **Formato:** Cadena con nombres de entidades separados por comas.
 
   ```plaintext
-  "Sales,Customer,Products"
+  "Customer,Product,Sales"
   ```
 
 - **Comportamiento:**
-  - Si se proporciona un valor válido, refresca solo dichas entidades junto a sus dependencias
-  - Si está vacío, refresca todas las entidades del modelo semántico
+  - Si se proporcionan tablas existentes en el modelo semántico, refresca solo dichas entidades junto a sus dependencias. 
+    - En caso de que alguna entidad no exista, se omite y se muestra una advertencia.
+    - Si todas las entidades proporcionadas son inválidas, se muestra un error y se aborta el proceso.
+  - Si está vacío, refresca todas las entidades del modelo semántico.
 
 #### `partitions_to_refresh`
 
@@ -55,81 +57,80 @@ El cuaderno **NB_PAR_REFRESHER** es responsable de la **ejecución controlada de
 ]
 ```
 
-- **Comportamiento:**:
-  - Si se proporciona un valor válido, refresca solo las particiones especificadas
-    - Si una entidad aparece en el parámetro `tables_to_refresh` pero no en `partitions_to_refresh`, se refrescan todas sus particiones
-    - Si una entidad aparece en el parámetro `partitions_to_refresh`, se refrescan solo las particiones listadas
-  - Si está vacío, refresca todas las particiones de las entidades seleccionadas
+- **Comportamiento:**
+  - Si se proporciona un valor válido, refresca solo las particiones especificadas.
+    - Si una entidad aparece en el parámetro `tables_to_refresh` pero no en `partitions_to_refresh`, se refrescan todas sus particiones.
+    - Si una entidad aparece en el parámetro `partitions_to_refresh`, se refrescan solo las particiones listadas.
+  - Si está vacío, refresca todas las particiones de las entidades seleccionadas.
+  - En caso de que alguna tabla o partición no existan, se omite y se muestra una advertencia.
 ---
 
 ## 🔄 Flujo de acciones
 
 ```mermaid
 flowchart TD
-    A["🟢 INICIO<br/>refresh()"] --> B["📊 Crear instancia Dataset<br/>Obtener el nombre del área de trabajo, el nombre del modelo semántico, las entidades y particiones existentes"]
-    
-    B --> C["📋 Obtener entidades a refrescar<br/>get_tables()"]
-    C --> D{¿Se proporcionó<br/>tables_to_refresh?}
-    
-    D -->|Sí| E["📌 Procesar lista de entidades<br/>- Separar por comas<br/>- Validar contra el modelo semántico"]
-    D -->|No| F["🔄 Refrescar todas las entidades"]
-    
-    E --> G{¿Entidades válidas?}
-    G -->|No| X["❌ Error validación<br/>Entidades inválidas<br/>Abortar"]
-    G -->|Sí| H["🔗 Encontrar entidades relacionadas<br/>get_related_tables<br/>Incluir dependencias"]
-    
-    F --> H
-    H --> I["✅ Se han identificado las entidades a refrescar"]
-    
-    I --> J["🎯 Obtener particiones a refrescar<br/>get_partitions()"]
-    J --> K{¿Se proporcionó<br/>partitions_to_refresh?}
-    
-    K -->|Sí| L["📌 Procesar JSON particiones<br/>Validar contra el modelo semántico"]
-    K -->|No| M["🔄 Refrescar todas<br/>las particiones"]
-    
-    L --> N{¿JSON válido?}
-    N -->|No| X
-    N -->|Sí| O["✅ Subconjunto de particiones<br/>seleccionado"]
-    
-    M --> P["✅ Se han identificado las particiones a refrescar"]
-    O --> P
-    
-    P --> Q["📊 Composición final<br/>Entidades seleccionadas +<br/>Particiones seleccionadas"]
-    
-    Q --> R["📤 Solicitar refresco<br/>dataset.refresh_objects<br/>Parámetros: particiones,<br/>commit_mode, max_parallelism"]
-    
-    R --> S["🔄 Obtener identificador del refresco"]
-    
-    S --> T{¿GUID<br/>válido?}
-    T -->|No| X
-    T -->|Sí| U["⏳ Monitorear estado<br/>dataset.check_refresh_status<br/>Polling hasta completar"]
-    
-    U --> V{¿Estado<br/>final?}
-    V -->|Completed| W["✅ Refresco completado<br/>Datos actualizados"]
-    V -->|Failed| Y["❌ Refresco fallido<br/>Revisar el historial para más detalles"]
-    
-    W --> Z["✅ FIN"]
-    Y --> X
-    
-    X --> END["⛔ Fin con error"]
-    Z --> END2["✅ Fin con éxito"]
-    
-    style A fill:#90EE90
-    style Z fill:#87CEEB
-    style END2 fill:#87CEEB
-    style X fill:#FFB6C6
-    style END fill:#FFB6C6
-    style R fill:#FFE4B5
-    style U fill:#FFE4B5
+  A["🟢 INICIO<br/>refresh()"] --> B["📊 Crear instancia Dataset<br/>Obtener nombres y metadatos"]
+  B --> C["📋 Identificar tablas a refrescar"]
+  C --> D{¿tables_to_refresh proporcionado?}
+  D -->|No| E["Obtener todas las tablas disponibles"]
+  D -->|Sí| F["Separar por comas y limpiar"]
+  F --> G["Validar contra el modelo semántico"]
+  G --> H{¿Tablas inválidas?}
+  H -->|Sí| I["⚠️ Advertencia: Existen tablas inválidas<br/>Omitir inválidas"]
+  I --> J{¿Quedan tablas válidas?}
+  J -->|No| X["❌ Error: todas inválidas<br/>Abortar"]
+  J -->|Sí| K["Obtener tablas relacionadas"]
+  H -->|No| K
+  E --> L["Obtener tablas relacionadas"]
+  K --> M["✅ Tablas a refrescar"]
+  L --> M
+  M --> N["📋 Identificar particiones a refrescar"]
+  N --> O{¿partitions_to_refresh proporcionado?}
+  O -->|No| P["Obtener todas las particiones del resto de las tablas seleccionadas"]
+  O -->|Sí| Q["Leer y parsear JSON de particiones"]
+  Q --> R["Validar si las tablas con particiones seleccionadas existen entre las tablas seleccionadas"]
+  R --> S{¿Tablas de particiones no seleccionadas?}
+  S -->|Sí| T["⚠️ Advertencia: Existen tablas inválidas con particiones seleccionadas<br/>Omitir"]
+  T --> U{¿Quedan tablas válidas?}
+  U -->|No| P
+  U -->|Sí| V["Validar particiones por tabla"]
+  S -->|No| V
+  V --> W{¿Particiones inválidas?}
+  W -->|Sí| X1["⚠️ Advertencia: Particiones inválidas<br/>Omitir"]
+  X1 --> Y["Componer listado de particiones"]
+  W -->|No| Y
+  Y --> Z["✅ Particiones a refrescar"]
+  P --> Z
+  Z --> AA["📤 Solicitar refresco"]
+  AA --> AB["🔄 Obtener identificador del refresco"]
+  AB --> AC{¿GUID válido?}
+  AC -->|No| X["⛔ Fin con error"]
+  AC -->|Sí| AD["⏳ Monitorear estado"]
+  AD --> AE{¿Estado final?}
+  AE -->|Completed| END2["✅ Refresco completado"]
+  AE -->|Failed| X["❌ Refresco fallido"]
+  END2 --> END3["✅ Fin con éxito"]
+  style A fill:#90EE90,color:#000
+  style END2 fill:#87CEEB,color:#000
+  style END3 fill:#87CEEB,color:#000
+  style X fill:#FFB6C6,color:#000
+  style X1 fill:#FFD580,color:#000
+  style I fill:#FFD580,color:#000
+  style T fill:#FFD580,color:#000
+  style END fill:#FFB6C6,color:#000
+  style AA fill:#FFE4B5,color:#000
+  style AD fill:#FFE4B5,color:#000
 ```
 
 ---
 
 ### Bibliotecas externas
 
-- **pandas**: Manipulación de DataFrames
-- **datetime**: Cálculos de fechas
-- **typing**: Tipos (List, Optional)
+- **pandas**: Manipulación de DataFrames.
+- **logging**: Sistema de logging.
+- **sys**: Manejo de excepciones y salida del programa.
+- **typing**: Tipos (List, Optional).
+- **StringIO**: Manejo de strings como archivos.
 
 ### fabtoolkit
 
