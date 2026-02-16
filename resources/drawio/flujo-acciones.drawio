@@ -1,0 +1,156 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.3.8">
+  <diagram name="Página-1" id="ZT-OPkHNdWjGhUjpIjgi">
+    <mxGraphModel dx="1418" dy="756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-1" parent="1" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#B3B3B3;shadow=1;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="80" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-2" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-1" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#000000;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;shadow=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-107" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=open;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-116" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-107" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font face=&quot;Segoe UI Semibold&quot; style=&quot;font-size: 12px;&quot;&gt;No&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1988" y="3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-3" parent="1" style="rhombus;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=none;shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;¿Particionar?&lt;/font&gt;" vertex="1">
+          <mxGeometry height="120" width="120" x="160" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-109" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;endArrow=open;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFE599,#FFE599);strokeColor=none;shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;Crear particiones pendientes&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="293" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-115" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=open;endFill=0;strokeWidth=2;" target="Ix7abKu9H2WIs_zPmwYK-21">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="480" />
+              <mxPoint x="1035" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-121" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-115" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 12px;&quot; face=&quot;Segoe UI Semibold&quot;&gt;No&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1583" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-15" parent="1" style="rhombus;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#DAE8FC;strokeColor=none;shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;¿Particionamiento correcto?&lt;/font&gt;" vertex="1">
+          <mxGeometry height="120" width="120" x="440" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-108" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-3" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-9" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="720" y="350" as="sourcePoint" />
+            <mxPoint x="770" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-117" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-108" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font face=&quot;Segoe UI Semibold&quot; style=&quot;font-size: 12px;&quot;&gt;Sí&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2061" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-113" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-15" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.506;entryY=0.976;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-19" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="621" y="410" />
+            </Array>
+            <mxPoint x="540" y="350" as="sourcePoint" />
+            <mxPoint x="590" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-119" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-113" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font face=&quot;Segoe UI Semibold&quot; style=&quot;font-size: 12px;&quot;&gt;Sí&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.15" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-70" parent="1" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#9AC7BF;strokeWidth=2;direction=south;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="1020" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-19" parent="1" style="rhombus;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;fillColor=#DAE8FC;shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;¿Hay objetos seleccionados&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Segoe UI Semibold&quot;&gt;para refrescar?&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="120" x="560" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-21" parent="1" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#FF3333;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="1020" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=light-dark(#FFE599,#FFE599);shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;Refrescar objetos seleccionados y dependencias&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="710" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-32" parent="1" style="rhombus;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;fillColor=#DAE8FC;shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;¿Refresco&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Segoe UI Semibold&quot;&gt;correcto?&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="120" x="860" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=light-dark(#FFE599,#FFE599);shadow=1;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;Refrescar el modelo completo&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="710" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-95" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-19" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-28" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="550" y="270" as="sourcePoint" />
+            <mxPoint x="600" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-124" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-95" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font face=&quot;Segoe UI Semibold&quot; style=&quot;font-size: 12px;&quot;&gt;No&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1452" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-96" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-19" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-27" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="660" y="320" as="sourcePoint" />
+            <mxPoint x="720" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-123" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-96" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 12px;&quot; face=&quot;Segoe UI Semibold&quot;&gt;Sí&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2981" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-98" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-27" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;endFill=0;strokeWidth=2;" target="Ix7abKu9H2WIs_zPmwYK-32" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="550" y="270" as="sourcePoint" />
+            <mxPoint x="600" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-100" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-28" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-32" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="850" y="430" as="sourcePoint" />
+            <mxPoint x="910" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-102" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-32" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-70" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="830" y="310" as="sourcePoint" />
+            <mxPoint x="880" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-127" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-102" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 12px;&quot; face=&quot;Segoe UI Semibold&quot;&gt;Sí&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.3015" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-103" edge="1" parent="1" source="Ix7abKu9H2WIs_zPmwYK-32" style="endArrow=open;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;endFill=0;" target="Ix7abKu9H2WIs_zPmwYK-21" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="970" y="354" as="sourcePoint" />
+            <mxPoint x="1044" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-126" connectable="0" parent="Ix7abKu9H2WIs_zPmwYK-103" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 12px;&quot; face=&quot;Segoe UI Semibold&quot;&gt;No&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2171" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-104" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;ÉXITO&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="50" x="1050" y="215" as="geometry" />
+        </mxCell>
+        <mxCell id="Ix7abKu9H2WIs_zPmwYK-105" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font face=&quot;Segoe UI Semibold&quot;&gt;ERROR&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="50" x="1050" y="445" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -12,11 +12,11 @@
 
 # PARAMETERS CELL ********************
 
-workspace_id: str = ""
-dataset_id: str = ""
-tables_to_refresh: str = ""
-partitions_to_refresh: str = ""
-commit_mode: str = ""
+workspace_id: str = ''
+dataset_id: str = ''
+tables_to_refresh: str = ''
+partitions_to_refresh: str = ''
+commit_mode: str = ''
 max_parallelism: int = 4
 
 # METADATA ********************

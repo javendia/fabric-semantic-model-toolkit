@@ -12,14 +12,14 @@
 
 # PARAMETERS CELL ********************
 
-workspace_id: str = ""
-dataset_id: str  = ""
+workspace_id: str = ''
+dataset_id: str  = ''
 enable_partition: bool = True
-partitions_config: str = ""
+partitions_config: str = ''
 enable_refresh: bool = True
-tables_to_refresh: str = ""
-partitions_to_refresh: str = ""
-refresh_commit_mode: str = "transactional"
+tables_to_refresh: str = ''
+partitions_to_refresh: str = ''
+refresh_commit_mode: str = 'transactional'
 refresh_max_parallelism: int = 4
 notebook_timeout: int = 7200
 

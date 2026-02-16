@@ -18,7 +18,7 @@ La estructura del repositorio es la siguiente:
 
 ```
 gppb2026/
-├── /doc/                                   # Documentación adicional
+├── /docs/                                   # Documentación adicional
 ├── /lib/                                   # Librerías personalizadas
     ├── fabtoolkit-1.0.0-py3-none-any.whl   # Conjunto de utilidades para trabajar con Microsoft Fabric
 ├── /resources/                             # Recursos adicionales (imágenes, ejemplos, etc.)

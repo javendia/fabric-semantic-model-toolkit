@@ -12,9 +12,9 @@
 
 # PARAMETERS CELL ********************
 
-workspace_id: str = ""
-dataset_id: str = ""
-partitions_config: str = ""
+workspace_id: str = ''
+dataset_id: str = ''
+partitions_config: str = ''
 
 # METADATA ********************
 
