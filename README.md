@@ -1,41 +1,35 @@
-![Global Power Platform Bootcamp 2026](./resources/img/banner.jpeg)
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 
-Repositorio de la ponencia **"Salvar al soldado Power BI: particiones y refrescos eficientes"**  
-**Evento:** Global Power Platform Bootcamp 2026 (Alicante)
+Conjunto de herramientas para operar, gestionar y automatizar tareas sobre modelos semánticos de Power BI como particionado, refresco de datos, etc.
 
 ---
-
-## 📖 Resumen
-
-El objetivo de este proyecto es la implementación de un flujo de trabajo que permita crear particiones automáticamente en conjuntos de datos de Power BI, así como ofrezca la posibilidad de actualizar todo el conjunto de datos o únicamente las tablas / particiones que se consideren necesarias.
 
 ## 📦 Contenidos
 
 La estructura del repositorio es la siguiente:
 
 ```
-gppb2026/
+fabric-semantic-model-toolkit/
 ├── /docs/                                  # Documentación adicional
 ├── /lib/                                   # Librerías personalizadas
     ├── fabtoolkit-1.0.0-py3-none-any.whl   # Conjunto de utilidades para trabajar con Microsoft Fabric
 ├── /resources/                             # Recursos adicionales (imágenes, ejemplos, etc.)
-├── /src/                                   # Código fuente de la solución
-│   ├── NB_PAR_ORCHESTRATOR.Notebook        # Orquestador principal
-│   ├── NB_PAR_PARTITIONER.Notebook         # Particionamiento
-│   └── NB_PAR_REFRESHER.Notebook           # Refresco de datos
+├── /src/                                   # Código fuente
+│   ├── REFRESHER/                          # Solución de particionado y refresco dinámico
 ├── LICENSE
 └── README.md
 ```
 
+### 🔄 REFRESHER
+
+Esta solución proporciona un marco de trabajo para gestionar el particionado y refresco dinámico de conjuntos de datos en Microsoft Fabric.
+
 | Elemento | Descripción |
 |----------|-------------|
-| **fabtoolkit-1.0.0-py3-none-any.whl** | Librería personalizada con funciones reutilizables para Microsoft Fabric |
-| [**NB_PAR_ORCHESTRATOR.Notebook**](./src/PARTITIONS/NB_PAR_ORCHESTRATOR.Notebook/README.md) | Cuaderno principal que controla el flujo completo: orquesta el particionado y el refresco del conjunto de datos |
-| [**NB_PAR_PARTITIONER.Notebook**](./src/PARTITIONS/NB_PAR_PARTITIONER.Notebook/README.md) | Genera particiones dinámicamente en función de criterios de fecha personalizables |
-| [**NB_PAR_REFRESHER.Notebook**](./src/PARTITIONS/NB_PAR_REFRESHER.Notebook/README.md) | Ejecuta el refresco del conjunto de datos para un grupo de tablas / particiones especificadas |
+| [**NB_PAR_ORCHESTRATOR.Notebook**](./src/REFRESHER/NB_PAR_ORCHESTRATOR.Notebook/README.md) | Cuaderno principal que controla el flujo completo: orquesta el particionado y el refresco del conjunto de datos |
+| [**NB_PAR_PARTITIONER.Notebook**](./src/REFRESHER/NB_PAR_PARTITIONER.Notebook/README.md) | Genera particiones dinámicamente en función de criterios de fecha personalizables |
+| [**NB_PAR_REFRESHER.Notebook**](./src/REFRESHER/NB_PAR_REFRESHER.Notebook/README.md) | Ejecuta el refresco del conjunto de datos para un grupo de tablas / particiones especificadas |
 
 Para más detalles sobre cada cuaderno, pulsa en los enlaces correspondientes arriba.
 
@@ -49,16 +43,10 @@ Para más detalles sobre cada cuaderno, pulsa en los enlaces correspondientes ar
 
 ## 🚀 Instalación y configuración
 
-1. Preparar el repositorio
+1. Bifurcar el repositorio en GitHub
 
-```bash
-# Opción A: Bifurcar en GitHub
-# Ve a https://github.com/javendia/gppb2026 y haz clic en "Fork"
-
-# Opción B: Clonar directamente
-git clone https://github.com/javendia/gppb2026.git
-cd gppb2026
-```
+    1. Navega a https://github.com/javendia/fabric-semantic-model-toolkit
+    2. Haz clic en el botón **Fork** para crear una copia del repositorio en tu cuenta de GitHub.
 
 2. Sincronizar con Fabric
 
@@ -69,15 +57,17 @@ cd gppb2026
     5. Selecciona la rama deseada (por ejemplo, **main**) y la carpeta raíz **src**
     6. Pulsa el botón **Conectar y sincronizar**
 
-3. En el área de trabajo de Fabric, abre el cuaderno **NB_PAR_ORCHESTRATOR**
-4. Importa la librería personalizada **fabtoolkit-1.0.0-py3-none-any.whl** entre los recursos integrados del cuaderno:
+> [!IMPORTANT]
+> Fabric descargará todos los artefactos automáticamente
+
+3. (Opcional) En el caso de querer emplear la utilidad de particionamiento y refresco dinámico, es necesario llevar a cabo una configuración adicional:
+
+    1. En el área de trabajo de Fabric, abre el cuaderno **NB_PAR_ORCHESTRATOR**
+    2. Importa la librería personalizada **fabtoolkit-1.0.0-py3-none-any.whl** entre los recursos integrados del cuaderno:
 
 <p align="center">
     <img src="./resources/img/install-wheel.png" alt="Importar librería personalizada" style="max-width: 400px; height: auto; border-radius: 8px;">
 </p>
-
-> [!IMPORTANT]
-> Fabric descargará todos los artefactos automáticamente
 
 ## 📚 Recursos y documentación
 
