@@ -60,7 +60,7 @@ Para más detalles sobre cada cuaderno, pulsa en los enlaces correspondientes ar
 > [!IMPORTANT]
 > Fabric descargará todos los artefactos automáticamente
 
-3. (Opcional) En el caso de querer emplear la utilidad de particionamiento y refresco dinámico, es necesario llevar a cabo una configuración adicional:
+3. **(Opcional)** En el caso de querer emplear la utilidad de particionamiento y refresco dinámico, es necesario llevar a cabo una configuración adicional:
 
     1. En el área de trabajo de Fabric, abre el cuaderno **NB_PAR_ORCHESTRATOR**
     2. Importa la librería personalizada **fabtoolkit-1.0.0-py3-none-any.whl** entre los recursos integrados del cuaderno:
