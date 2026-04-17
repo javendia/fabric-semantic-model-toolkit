@@ -2,27 +2,27 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 
-## 📋 Resumen
+## 📋 Summary
 
-El cuaderno **NB_PAR_ORCHESTRATOR** es el orquestador principal del flujo de trabajo para la gestión de particiones y refresco de datos en conjuntos de datos de Power BI dentro de Microsoft Fabric. Este cuaderno coordina la creación automática de particiones y la actualización selectiva de tablas o particiones según las configuraciones definidas por el usuario.
+The **NB_PAR_ORCHESTRATOR** notebook is the main orchestrator of the workflow for partition management and data refresh in Power BI datasets within Microsoft Fabric. This notebook coordinates the automatic creation of partitions and selective updates of tables or partitions according to configurations defined by the user.
 
 ---
 
-## ➡️ Parámetros de entrada
+## ➡️ Input parameters
 
-### Configuración básica
+### Basic Configuration
 
-| Parámetro | Tipo | Descripción | Ejemplo |
+| Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `workspace_id` | string | GUID del área de trabajo de Microsoft Fabric | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
-| `dataset_id` | string | GUID del modelo semántico de Power BI | `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
+| `workspace_id` | string | GUID of the Microsoft Fabric workspace | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
+| `dataset_id` | string | GUID of the Power BI semantic model | `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
 
-### Parámetros globales
-| Parámetro | Tipo | Descripción | Ejemplo |
+### Global parameters
+| Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `partitions_config` | string (JSON) | Configuración para la creación y el refresco de particiones | Ver tabla abajo |
+| `partitions_config` | string (JSON) | Configuration for partition creation and refresh | See table below |
 
-**Ejemplo de `partitions_config`:**
+**Example of `partitions_config`:**
 ```json
 [
   {
@@ -36,30 +36,30 @@ El cuaderno **NB_PAR_ORCHESTRATOR** es el orquestador principal del flujo de tra
 ]
 ```
 
-| Campo | Tipo | Descripción | Ejemplo |
+| Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `table` | string | Nombre de la entidad del modelo semántico a particionar | `"Sales"` |
-| `first_date` | string | Fecha inicial de particionamiento (formato YYYYMMDD) | `"20200101"` |
-| `partition_by` | string | Nombre de la columna de fecha para particionar | `"Order Date"` |
-| `interval` | string | Intervalo de particionamiento | `"MONTH"`, `"QUARTER"`, `"YEAR"` |
-| `last_date` | string | Fecha final de particionamiento o partir de la cual refrescar (formato YYYYMMDD) | `"20250101"` |
-| `intervals_to_refresh` | string | Cuántos períodos incluir. Si el valor es *, refresca todos los períodos disponibles | `"4"` |
+| `table` | string | Name of the semantic model entity to partition | `"Sales"` |
+| `first_date` | string | Initial partitioning date (YYYYMMDD format) | `"20200101"` |
+| `partition_by` | string | Name of the date column for partitioning | `"Order Date"` |
+| `interval` | string | Partitioning interval | `"MONTH"`, `"QUARTER"`, `"YEAR"` |
+| `last_date` | string | Final partitioning date or starting point for refresh (YYYYMMDD format) | `"20250101"` |
+| `intervals_to_refresh` | string | How many periods to include. If the value is *, refreshes all available periods | `"4"` |
 
-### Parámetros de particionamiento
+### Partitioning parameters
 
-| Parámetro | Tipo | Descripción | Ejemplo |
+| Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `enable_partition` | boolean | Habilita/deshabilita la creación de particiones | `True` / `False` |
+| `enable_partition` | boolean | Enables/disables partition creation | `True` / `False` |
 
-### Parámetros de refresco
+### Refresh parameters
 
-| Parámetro | Tipo | Descripción | Ejemplo |
+| Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `enable_refresh` | boolean | Habilita/deshabilita el refresco del modelo semántico | `True` / `False` |
-| `tables_to_refresh` | string | Tablas a refrescar (separadas por comas) | `"Customer,Sales"` |
-| `partitions_to_refresh` | string (JSON) | Particiones específicas a refrescar | Ver tabla abajo |
+| `enable_refresh` | boolean | Enables/disables semantic model refresh | `True` / `False` |
+| `tables_to_refresh` | string | Tables to refresh (comma-separated) | `"Customer,Sales"` |
+| `partitions_to_refresh` | string (JSON) | Specific partitions to refresh | See table below |
 
-**Ejemplo de `partitions_to_refresh`:**
+**Example of `partitions_to_refresh`:**
 ```json
 [
   {
@@ -69,43 +69,43 @@ El cuaderno **NB_PAR_ORCHESTRATOR** es el orquestador principal del flujo de tra
 ]
 ```
 
-### Parámetros de ejecución
+### Execution parameters
 
-| Parámetro | Tipo | Descripción | Valores |
-|-----------|------|-------------|---------|
-| `refresh_commit_mode` | string | Confirmación de transacciones | `"transactional"` (predeterminado) o `"partialBatch"` |
-| `refresh_max_parallelism` | integer | Número máximo de entidades a refrescar en paralelo | (recomendado: `4-6`) |
-| `notebook_timeout` | integer | Tiempo máximo de ejecución del cuaderno en segundos | (recomendado: `7200`) |
+| Parameter | Type | Description | Values |
+|-----------|------|-------------|--------|
+| `refresh_commit_mode` | string | Transaction confirmation | `"transactional"` (default) or `"partialBatch"` |
+| `refresh_max_parallelism` | integer | Maximum number of entities to refresh in parallel | (recommended: `4-6`) |
+| `notebook_timeout` | integer | Maximum notebook execution time in seconds | (recommended: `7200`) |
 
 ---
 
-## 🔄 Flujo de acciones
+## 🔄 Action flow
 
 ```mermaid
 flowchart TD
-  A["🟢 INICIO<br/>Validación de parámetros"] --> B{¿enable_partition<br/>activo?}
-  B -->|Sí| C["📌 Ejecutar NB_PAR_PARTITIONER<br/>(Crear particiones)"]
-  B -->|No| D["⏭️ Particionamiento deshabilitado"]
-  C --> E{¿Particionamiento<br/>con éxito?}
-  C -->|No| X["❌ Error crítico<br/>Abortar ejecución"]
-  C -->|Sí| F{¿enable_refresh<br/>activo?}
+  A["🟢 START<br/>Parameter validation"] --> B{¿enable_partition<br/>active?}
+  B -->|Yes| C["📌 Run NB_PAR_PARTITIONER<br/>(Create partitions)"]
+  B -->|No| D["⏭️ Partitioning disabled"]
+  C --> E{¿Partitioning<br/>successful?}
+  C -->|No| X["❌ Critical error<br/>Abort execution"]
+  C -->|Yes| F{¿enable_refresh<br/>active?}
   D --> F
-  F -->|No| Z["✅ FIN<br/>"]
-  F -->|Sí| G{¿partitions_to_refresh<br/>proporcionado?}
-  G -->|Sí| H["📋 Usar partitions_to_refresh<br/>explícito"]
-  G -->|No| I{¿partitions_config<br/>proporcionado?}
-  I -->|Sí| J["📊 Generar lista de particiones<br/>generate_partitions_list()"]
-  I -->|No| K["🔄 Refrescar todas<br/>las particiones"]
-  J --> L{¿Generación<br/>con éxito?}
+  F -->|No| Z["✅ END<br/>"]
+  F -->|Yes| G{¿partitions_to_refresh<br/>provided?}
+  G -->|Yes| H["📋 Use explicit partitions_to_refresh"]
+  G -->|No| I{¿partitions_config<br/>provided?}
+  I -->|Yes| J["📊 Generate partition list<br/>generate_partitions_list()"]
+  I -->|No| K["🔄 Refresh all<br/>partitions"]
+  J --> L{¿Generation<br/>successful?}
   L -->|No| X
-  L -->|Sí| H
-  H --> N["🔄 Ejecutar NB_PAR_REFRESHER<br/>(Refrescar modelo)"]
+  L -->|Yes| H
+  H --> N["🔄 Run NB_PAR_REFRESHER<br/>(Refresh model)"]
   K --> N
-  N --> O{¿Refresco<br/>con éxito?}
+  N --> O{¿Refresh<br/>successful?}
   O -->|No| X
-  O -->|Sí| Z
-  X --> END["⛔ Fin con error"]
-  Z --> END2["✅ Fin con éxito"]
+  O -->|Yes| Z
+  X --> END["⛔ End with error"]
+  Z --> END2["✅ End successfully"]
   style A fill:#90EE90,color:#000
   style Z fill:#87CEEB,color:#000
   style END2 fill:#87CEEB,color:#000
@@ -117,48 +117,50 @@ flowchart TD
 
 ---
 
-## 📦 Dependencias
+## 📦 Dependencies
 
-### Bibliotecas externas
+### External libraries
 
-- **pandas**: Manipulación de DataFrames.
-- **datetime**: Cálculos de fechas.
-- **typing**: Tipos (Optional, Any, Dict).
-- **logging**: Sistema de logging.
-- **notebookutils**: Paquete integrado para llevar a cabo tareas comunes en cuadernos de Microsoft Fabric.
-- **StringIO**: Manejo de strings como archivos.
-- **uuid**: Generación de identificadores únicos.
-- **numpy**: Operaciones numéricas y manejo de arrays.
+- **pandas**: DataFrame manipulation.
+- **datetime**: Date calculations.
+- **typing**: Types (Optional, Any, Dict).
+- **logging**: Logging system.
+- **notebookutils**: Built-in package for performing common tasks in Microsoft Fabric notebooks.
+- **StringIO**: Handling strings as files.
+- **uuid**: Generation of unique identifiers.
+- **numpy**: Numerical operations and array handling.
 
 ### fabtoolkit
 
-Conjunto de utilidades personalizadas para facilitar operaciones comunes en Microsoft Fabric.
+Custom utilities toolkit to facilitate common operations in Microsoft Fabric. For more information about the bookstore, click the following [**link**](./fabtoolkit/README.md).
+
+The notebook uses the following functions from the `fabtoolkit` library:
 
 ```python
 from fabtoolkit.utils import (
-    get_bounds_from_offset,       # Calcular fechas límite
-    generate_date_ranges,         # Generar intervalos de fechas
-    is_valid_text,                # Validar texto no vacío
-    validate_json,                # Analizar y validar JSON
+    get_bounds_from_offset,       # Calculate boundary dates
+    generate_date_ranges,         # Generate date intervals
+    is_valid_text,                # Validate non-empty text
+    validate_json,                # Parse and validate JSON
     Constants
 )
-from fabtoolkit.log import ConsoleFormatter    # Formato de logging personalizado
+from fabtoolkit.log import ConsoleFormatter    # Custom logging format
 ```
 
-**Versión de fabtoolkit:** `1.0.0`
+**fabtoolkit version:** `1.0.0`
 
 ---
 
-## 📈 Ejemplo de ejecución
+## 📈 Execution examples
 
-### 1. Solo particionar hasta la fecha actual
+### 1. Only partition until the current date
 ```python
 enable_partition = True
 partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "TODAY", "intervals_to_refresh": "*"}]'
 enable_refresh = False
 ```
 
-### 2. Particionar hasta una determinada fecha y refrescar todos los períodos
+### 2. Partition until a specific date and refresh all periods
 ```python
 enable_partition = True
 partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "*"}]'
@@ -170,7 +172,7 @@ refresh_max_parallelism = 6
 notebook_timeout = 7200
 ```
 
-### 3. Solo refrescar algunas tablas y un rango de particiones específico
+### 3. Only refresh some tables and a specific range of partitions
 ```python
 enable_partition = False
 partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "4"}]'
@@ -182,7 +184,7 @@ refresh_max_parallelism = 6
 notebook_timeout = 7200
 ```
 
-### 4. Solo refrescar particiones específicas
+### 4. Only refresh specific partitions
 ```python
 enable_partition = False
 partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "*"}]'
@@ -196,9 +198,9 @@ notebook_timeout = 7200
 
 ---
 
-## 🔗 Cuadernos relacionados
+## 🔗 Related notebooks
 
-- [**NB_PAR_PARTITIONER**](./NB_PAR_PARTITIONER.Notebook/README.md): Genera particiones dinámicamente en función de criterios de fecha personalizables.
-- [**NB_PAR_REFRESHER**](./NB_PAR_REFRESHER.Notebook/README.md): Ejecuta el refresco del conjunto de datos para un grupo de tablas / particiones especificadas.
+- [**NB_PAR_PARTITIONER**](./NB_PAR_PARTITIONER.Notebook/README.md): Dynamically generates partitions based on customizable date criteria.
+- [**NB_PAR_REFRESHER**](./NB_PAR_REFRESHER.Notebook/README.md): Executes dataset refresh for a specified group of tables / partitions.
 
 ---

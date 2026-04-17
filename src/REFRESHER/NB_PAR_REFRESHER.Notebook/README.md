@@ -1,48 +1,49 @@
 # NB_PAR_REFRESHER
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 
-## 📋 Resumen
+## 📋 Summary
 
-El cuaderno **NB_PAR_REFRESHER** es responsable de la **ejecución controlada de refrescos de datos en modelos semánticos de Power BI**. Permite a los usuarios especificar entidades y particiones concretas para refrescar, optimizando así el uso de recursos y reduciendo los tiempos de actualización al evitar refrescos completos innecesarios.
+The **NB_PAR_REFRESHER** notebook is responsible for **controlled execution of data refreshes on Power BI semantic models**. It allows users to specify specific entities and partitions to refresh, thus optimizing resource usage and reducing update times by avoiding unnecessary full refreshes.
 
 ---
 
-## ➡️ Parámetros de entrada
+## ➡️ Input parameters
 
-### Configuración básica
+### Basic configuration
 
-| Parámetro | Tipo | Descripción | Ejemplo |
+| Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `workspace_id` | string | GUID del área de trabajo de Microsoft Fabric | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
-| `dataset_id` | string | GUID del modelo semántico de Power BI | `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
+| `workspace_id` | string | GUID of the Microsoft Fabric workspace | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
+| `dataset_id` | string | GUID of the Power BI semantic model | `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
 
-### Parámetros de refresco
+### Refresh parameters
 
-| Parámetro | Tipo | Descripción | Ejemplo | Por defecto |
-|-----------|------|-------------|---------|-------------|
-| `tables_to_refresh` | string | Entidades a refrescar (separadas por comas) | `"Customer,Sales"` | Todas las entidades |
-| `partitions_to_refresh` | string (JSON) | Particiones específicas a refrescar | Ver tabla abajo | Todas las particiones |
-| `commit_mode` | string | Confirmación de transacciones | `"transactional"`, `"partialBatch"` | `"transactional"` |
-| `max_parallelism` | integer | Número máximo de entidades a refrescar en paralelo | `6` | `4` |
+| Parameter | Type | Description | Example | Default |
+|-----------|------|-------------|---------|---------|
+| `tables_to_refresh` | string | Entities to refresh (comma-separated) | `"Customer,Sales"` | All entities |
+| `partitions_to_refresh` | string (JSON) | Specific partitions to refresh | See table below | All partitions |
+| `commit_mode` | string | Transaction confirmation | `"transactional"`, `"partialBatch"` | `"transactional"` |
+| `max_parallelism` | integer | Maximum number of entities to refresh in parallel | `6` | `4` |
 
 #### `tables_to_refresh`
 
-- **Formato:** Cadena con nombres de entidades separados por comas.
+- **Format:** String with entity names separated by commas.
 
   ```plaintext
   "Customer,Product,Sales"
   ```
 
-- **Comportamiento:**
-  - Si se proporcionan tablas existentes en el modelo semántico, refresca solo dichas entidades junto a sus dependencias. 
-    - En caso de que alguna entidad no exista, se omite y se muestra una advertencia.
-    - Si todas las entidades proporcionadas son inválidas, se muestra un error y se aborta el proceso.
-  - Si está vacío, refresca todas las entidades del modelo semántico.
+- **Behavior:**
+  - If existing tables in the semantic model are provided, it refreshes only those entities along with their dependencies. 
+    - If any entity does not exist, it is skipped and a warning is displayed.
+    - If all provided entities are invalid, an error is shown and the process is aborted.
+  - If empty, it refreshes all entities in the semantic model.
 
 #### `partitions_to_refresh`
 
-- **Formato:** JSON de entidades y particiones a refrescar 
+- **Format:** JSON of entities and partitions to refresh
 
 ```json
 [
@@ -57,59 +58,59 @@ El cuaderno **NB_PAR_REFRESHER** es responsable de la **ejecución controlada de
 ]
 ```
 
-- **Comportamiento:**
-  - Si se proporciona un valor válido, refresca solo las particiones especificadas.
-    - Si una entidad aparece en el parámetro `tables_to_refresh` pero no en `partitions_to_refresh`, se refrescan todas sus particiones.
-    - Si una entidad aparece en el parámetro `partitions_to_refresh`, se refrescan solo las particiones listadas.
-  - Si está vacío, refresca todas las particiones de las entidades seleccionadas.
-  - En caso de que alguna tabla o partición no existan, se omite y se muestra una advertencia.
+- **Behavior:**
+  - If a valid value is provided, it refreshes only the specified partitions.
+    - If an entity appears in the `tables_to_refresh` parameter but not in `partitions_to_refresh`, all its partitions are refreshed.
+    - If an entity appears in the `partitions_to_refresh` parameter, only the listed partitions are refreshed.
+  - If empty, it refreshes all partitions of the selected entities.
+  - If any table or partition does not exist, it is skipped and a warning is displayed.
 ---
 
-## 🔄 Flujo de acciones
+## 🔄 Action flow
 
 ```mermaid
 flowchart TD
-  A["🟢 INICIO<br/>refresh()"] --> B["📊 Crear instancia Dataset<br/>Obtener nombres y metadatos"]
-  B --> C["📋 Identificar tablas a refrescar"]
-  C --> D{¿tables_to_refresh proporcionado?}
-  D -->|No| E["Obtener todas las tablas disponibles"]
-  D -->|Sí| F["Separar por comas y limpiar"]
-  F --> G["Validar contra el modelo semántico"]
-  G --> H{¿Tablas inválidas?}
-  H -->|Sí| I["⚠️ Advertencia: Existen tablas inválidas<br/>Omitir inválidas"]
-  I --> J{¿Quedan tablas válidas?}
-  J -->|No| X["❌ Error: todas inválidas<br/>Abortar"]
-  J -->|Sí| K["Obtener tablas relacionadas"]
+  A["🟢 START<br/>refresh()"] --> B["📊 Create Dataset instance<br/>Get names and metadata"]
+  B --> C["📋 Identify tables to refresh"]
+  C --> D{¿tables_to_refresh provided?}
+  D -->|No| E["Get all available tables"]
+  D -->|Yes| F["Split by comma and clean"]
+  F --> G["Validate against semantic model"]
+  G --> H{¿Invalid tables?}
+  H -->|Yes| I["⚠️ Warning: Invalid tables found<br/>Omit invalid ones"]
+  I --> J{¿Valid tables remain?}
+  J -->|No| X["❌ Error: all invalid<br/>Abort"]
+  J -->|Yes| K["Get related tables"]
   H -->|No| K
-  E --> L["Obtener tablas relacionadas"]
-  K --> M["✅ Tablas a refrescar"]
+  E --> L["Get related tables"]
+  K --> M["✅ Tables to refresh"]
   L --> M
-  M --> N["📋 Identificar particiones a refrescar"]
-  N --> O{¿partitions_to_refresh proporcionado?}
-  O -->|No| P["Obtener todas las particiones del resto de las tablas seleccionadas"]
-  O -->|Sí| Q["Leer y parsear JSON de particiones"]
-  Q --> R["Validar si las tablas con particiones seleccionadas existen entre las tablas seleccionadas"]
-  R --> S{¿Tablas de particiones no seleccionadas?}
-  S -->|Sí| T["⚠️ Advertencia: Existen tablas inválidas con particiones seleccionadas<br/>Omitir"]
-  T --> U{¿Quedan tablas válidas?}
+  M --> N["📋 Identify partitions to refresh"]
+  N --> O{¿partitions_to_refresh provided?}
+  O -->|No| P["Get all partitions from selected tables"]
+  O -->|Yes| Q["Read and parse partition JSON"]
+  Q --> R["Validate if tables with selected partitions exist among selected tables"]
+  R --> S{¿Partition tables not selected?}
+  S -->|Yes| T["⚠️ Warning: Invalid tables with selected partitions found<br/>Omit"]
+  T --> U{¿Valid tables remain?}
   U -->|No| P
-  U -->|Sí| V["Validar particiones por tabla"]
+  U -->|Yes| V["Validate partitions per table"]
   S -->|No| V
-  V --> W{¿Particiones inválidas?}
-  W -->|Sí| X1["⚠️ Advertencia: Particiones inválidas<br/>Omitir"]
-  X1 --> Y["Componer listado de particiones"]
+  V --> W{¿Invalid partitions?}
+  W -->|Yes| X1["⚠️ Warning: Invalid partitions<br/>Omit"]
+  X1 --> Y["Compose list of partitions"]
   W -->|No| Y
-  Y --> Z["✅ Particiones a refrescar"]
+  Y --> Z["✅ Partitions to refresh"]
   P --> Z
-  Z --> AA["📤 Solicitar refresco"]
-  AA --> AB["🔄 Obtener identificador del refresco"]
-  AB --> AC{¿GUID válido?}
-  AC -->|No| X["⛔ Fin con error"]
-  AC -->|Sí| AD["⏳ Monitorear estado"]
-  AD --> AE{¿Estado final?}
-  AE -->|Completed| END2["✅ Refresco completado"]
-  AE -->|Failed| X["❌ Refresco fallido"]
-  END2 --> END3["✅ Fin con éxito"]
+  Z --> AA["📤 Request refresh"]
+  AA --> AB["🔄 Get refresh identifier"]
+  AB --> AC{¿Valid GUID?}
+  AC -->|No| X["⛔ End with error"]
+  AC -->|Yes| AD["⏳ Monitor status"]
+  AD --> AE{¿Final status?}
+  AE -->|Completed| END2["✅ Refresh completed"]
+  AE -->|Failed| X["❌ Refresh failed"]
+  END2 --> END3["✅ End successfully"]
   style A fill:#90EE90,color:#000
   style END2 fill:#87CEEB,color:#000
   style END3 fill:#87CEEB,color:#000
@@ -124,31 +125,33 @@ flowchart TD
 
 ---
 
-### Bibliotecas externas
+### External libraries
 
-- **pandas**: Manipulación de DataFrames.
-- **logging**: Sistema de logging.
-- **sys**: Manejo de excepciones y salida del programa.
-- **typing**: Tipos (List, Optional).
-- **StringIO**: Manejo de strings como archivos.
+- **pandas**: DataFrame manipulation.
+- **logging**: Logging system.
+- **sys**: Exception handling and program output.
+- **typing**: Types (List, Optional).
+- **StringIO**: Handling strings as files.
 
 ### fabtoolkit
 
-Conjunto de utilidades personalizadas para facilitar operaciones comunes en Microsoft Fabric.
+Custom utilities toolkit to facilitate common operations in Microsoft Fabric. For more information about the bookstore, click the following [**link**](./fabtoolkit/README.md).
+
+The notebook uses the following functions from the `fabtoolkit` library:
 
 ```python
 from fabtoolkit.utils import (
-    is_valid_text          # Validar string no vacío
+    is_valid_text          # Validate non-empty string
 )
-from fabtoolkit.log import ConsoleFormatter    # Formato de logging personalizado
-from fabtoolkit.dataset import Dataset         # Clase para operaciones sobre modelos semánticos
+from fabtoolkit.log import ConsoleFormatter    # Custom logging format
+from fabtoolkit.dataset import Dataset         # Class for operations on semantic models
 ```
 
 ---
 
-## Ejemplos de uso
+## Usage examples
 
-### Ejemplo 1: Refrescar todas las entidades y particiones
+### Example 1: Refresh all entities and partitions
 
 ```python
 tables_to_refresh = None
@@ -157,7 +160,7 @@ commit_mode = "transactional"
 max_parallelism = 4
 ```
 
-### Ejemplo 2: Refrescar solo una entidad y todas sus particiones
+### Example 2: Refresh only one entity and all its partitions
 
 ```python
 tables_to_refresh = "Sales"
@@ -166,7 +169,7 @@ commit_mode = "transactional"
 max_parallelism = 4
 ```
 
-### Ejemplo 3: Refrescar solo una entidad y particiones específicas
+### Example 3: Refresh only one entity and specific partitions
 
 ```python
 tables_to_refresh = "Sales"
@@ -182,13 +185,13 @@ max_parallelism = 4
 
 ---
 
-## 📝 Notas de implementación
+## 📝 Implementation notes
 
-### Búsqueda de entidades relacionadas
+### Related entities search
 ```python
 dataset.get_related_tables(["Sales"])
-# Devuelve: [Sales, Customer, Product, Store, etc.]
-# Todas las entidades con relaciones directas/indirectas
+# Returns: [Sales, Customer, Product, Store, etc.]
+# All entities with direct/indirect relationships
 ```
 
 ---

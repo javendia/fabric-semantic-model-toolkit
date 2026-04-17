@@ -1,0 +1,3 @@
+pandas
+semantic-link
+semantic-link-labs

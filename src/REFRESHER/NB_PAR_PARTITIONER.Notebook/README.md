@@ -2,21 +2,21 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 
-## 📋 Resumen
+## 📋 Summary
 
-El cuaderno **NB_PAR_PARTITIONER** es responsable de la **creación de particiones en modelos semánticos de Power BI**. Valida la configuración de particionamiento proporcionada por el usuario, genera automáticamente los intervalos de fechas necesarios y crea las particiones en el modelo semántico especificado.
+The **NB_PAR_PARTITIONER** notebook is responsible for **creating partitions on Power BI semantic models**. It validates the partitioning configuration provided by the user, automatically generates the necessary date intervals, and creates the partitions on the specified semantic model.
 
 ---
 
-## ➡️ Parámetros de entrada
+## ➡️ Input parameters
 
-| Parámetro | Tipo | Descripción | Ejemplo |
+| Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `workspace_id` | string | GUID del área de trabajo de Microsoft Fabric. | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
-| `dataset_id` | string | GUID del modelo semántico de Power BI.| `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
-| `partitions_config` | string (JSON) | Configuración de particiones a crear. | Ver tabla abajo |
+| `workspace_id` | string | GUID of the Microsoft Fabric workspace. | `"dc1b17ac-1d39-4be3-a848-45c8a55c05f1"` |
+| `dataset_id` | string | GUID of the Power BI semantic model.| `"0e4e85ca-f446-44b6-bf18-2a9114668242"` |
+| `partitions_config` | string (JSON) | Configuration of partitions to create. | See table below |
 
-**Ejemplo de `partitions_config`:**
+**Example of `partitions_config`:**
 ```json
 [
   {
@@ -29,72 +29,72 @@ El cuaderno **NB_PAR_PARTITIONER** es responsable de la **creación de particion
 ]
 ```
 
-| Campo | Tipo | Descripción | Ejemplo |
+| Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `table` | string | Nombre de la entidad del modelo semántico a particionar | `"Sales"` |
-| `first_date` | string | Fecha inicial de particionamiento (formato YYYYMMDD) | `"20200101"` |
-| `partition_by` | string | Nombre de la columna de fecha para particionar | `"Order Date"` |
-| `interval` | string | Intervalo de particionamiento | `MONTH`, `QUARTER`, `YEAR` |
-| `last_date` | string | Fecha final de particionamiento (formato YYYYMMDD) | `"20250101"` |
+| `table` | string | Name of the semantic model entity to partition | `"Sales"` |
+| `first_date` | string | Initial partitioning date (YYYYMMDD format) | `"20200101"` |
+| `partition_by` | string | Name of the date column for partitioning | `"Order Date"` |
+| `interval` | string | Partitioning interval | `MONTH`, `QUARTER`, `YEAR` |
+| `last_date` | string | Final partitioning date (YYYYMMDD format) | `"20250101"` |
 
-El cuaderno valida automáticamente:
-- ✅ Que todas las entidades en `partitions_config` existan en el modelo semántico.
-- ✅ Que todas las columnas `partition_by` sean válidas.
-- ✅ Que `first_date` esté en formato YYYYMMDD.
-- ✅ Que `last_date` esté en formato YYYYMMDD.
-- ✅ Que `interval` sea un valor válido (`MONTH`, `QUARTER` o `YEAR`).
+The notebook automatically validates:
+- ✅ That all entities in `partitions_config` exist in the semantic model.
+- ✅ That all `partition_by` columns are valid.
+- ✅ That `first_date` is in YYYYMMDD format.
+- ✅ That `last_date` is in YYYYMMDD format.
+- ✅ That `interval` is a valid value (`MONTH`, `QUARTER`, or `YEAR`).
 
 ---
 
-## 🔄 Flujo de acciones
+## 🔄 Action flow
 
 ```mermaid
 flowchart TD
-    A["🟢 INICIO<br/>partition()"] --> B["📊 Crear instancia Dataset<br/>Obtener el nombre del área de trabajo, el nombre del modelo semántico y las particiones existentes"]
+    A["🟢 START<br/>partition()"] --> B["📊 Create Dataset instance<br/>Get workspace name, semantic model name and existing partitions"]
     
-    B --> C["✅ Validar configuración"]
+    B --> C["✅ Validate configuration"]
     
-    C --> D{¿Validación<br/>con éxito?}
-    D -->|No| X["❌ Error validación<br/>Mostrar detalles<br/>Abortar"]
-    D -->|Sí| E["🔄 Para cada tabla<br/>en la configuración"]
+    C --> D{¿Validation<br/>successful?}
+    D -->|No| X["❌ Validation error<br/>Show details<br/>Abort"]
+    D -->|Yes| E["🔄 For each table<br/>in the configuration"]
     
-    E --> F["📋 Generar intervalos de fechas"]
+    E --> F["📋 Generate date intervals"]
     
-    F --> G["📝 Crear nombres de particiones<br/>Formato: table_YYYYMMDD_YYYYMMDD<br/>Ej: Sales_20200101_20200331"]
+    F --> G["📝 Create partition names<br/>Format: table_YYYYMMDD_YYYYMMDD<br/>Ex: Sales_20200101_20200331"]
     
-    G --> H["🔍 Comparar con las existentes<br/>¿La partición ya existe?"]
+    G --> H["🔍 Compare with existing<br/>¿Partition already exists?"]
     
-    H -->|Sí| I["⏭️ La partición existe<br/>No requiere creación"]
-    H -->|No| J["⚡ Pendiente de crear"]
+    H -->|Yes| I["⏭️ Partition exists<br/>No creation required"]
+    H -->|No| J["⚡ Pending creation"]
     
-    I --> K{¿Hay particiones<br/>pendientes de crear?}
+    I --> K{¿Are there partitions<br/>pending creation?}
     J --> K
     
-    K -->|No| L["ℹ️ Todas las particiones<br/>ya existen"]
-    K -->|Sí| M["Extraer la consulta original<br/>Obtener último paso"]
+    K -->|No| L["ℹ️ All partitions<br/>already exist"]
+    K -->|Yes| M["Extract original query<br/>Get last step"]
     
-    M --> N["🔧 Generar consultas M"]
+    M --> N["🔧 Generate M queries"]
     
-    N --> O["💾 Crear particiones"]
+    N --> O["💾 Create partitions"]
     
-    O --> P{¿Creación<br/>con éxito?}
+    O --> P{¿Creation<br/>successful?}
     P -->|No| X
-    P -->|Sí| Q["✅ Particiones creadas"]
+    P -->|Yes| Q["✅ Partitions created"]
     
-    Q --> R{¿Existe la partición<br/>por defecto?<br/>tabla == partition_name}
+    Q --> R{¿Does default partition exist?<br/>table == partition_name}
     
-    R -->|Sí| S["🗑️ Eliminar partición por defecto"]
-    R -->|No| T["ℹ️ Sin partición<br/>por defecto"]
+    R -->|Yes| S["🗑️ Delete default partition"]
+    R -->|No| T["ℹ️ No default<br/>partition"]
     
-    S --> U{¿Más entidades?}
+    S --> U{¿More entities?}
     T --> U
     L --> U
     
-    U -->|Sí| E
-    U -->|No| V["✅ FIN <br/>Se han procesado todas las entidades del listado de configuración"]
+    U -->|Yes| E
+    U -->|No| V["✅ END <br/>All entities from configuration list have been processed"]
     
-    V --> END["✅ Fin con éxito"]
-    X --> END2["⛔ Fin con error"]
+    V --> END["✅ End successfully"]
+    X --> END2["⛔ End with error"]
     
     style A fill:#90EE90,color:#000
     style V fill:#87CEEB,color:#000
@@ -108,38 +108,40 @@ flowchart TD
 
 ---
 
-## 📦 Dependencias
+## 📦 Dependencies
 
-### Bibliotecas externas
+### External libraries
 
-- **pandas**: Manipulación de DataFrames.
-- **datetime**: Cálculos de fechas.
-- **typing**: Tipos (Dict, List).
-- **logging**: Sistema de logging.
-- **sys**: Manejo de excepciones y salida del programa.
-- **StringIO**: Manejo de strings como archivos.
+- **pandas**: DataFrame manipulation.
+- **datetime**: Date calculations.
+- **typing**: Types (Dict, List).
+- **logging**: Logging system.
+- **sys**: Exception handling and program output.
+- **StringIO**: Handling strings as files.
 
 ### fabtoolkit
 
-Conjunto de utilidades personalizadas para facilitar operaciones comunes en Microsoft Fabric.
+Custom utilities toolkit to facilitate common operations in Microsoft Fabric. For more information about the bookstore, click the following [**link**](./fabtoolkit/README.md).
+
+The notebook uses the following functions from the `fabtoolkit` library:
 
 ```python
 from fabtoolkit.utils import (
-    generate_date_ranges,     # Generar intervalos de fechas
-    Constants,                # Constantes globales (DATE_FORMAT, INTERVALS)
-    Interval                  # Enum de intervalos válidos
+    generate_date_ranges,     # Generate date intervals
+    Constants,                # Global constants (DATE_FORMAT, INTERVALS)
+    Interval                  # Enum of valid intervals
 )
-from fabtoolkit.log import ConsoleFormatter    # Formato de logging personalizado
-from fabtoolkit.dataset import Dataset         # Clase para operaciones sobre modelos semánticos
+from fabtoolkit.log import ConsoleFormatter    # Custom logging format
+from fabtoolkit.dataset import Dataset         # Class for operations on semantic models
 ```
 
-**Versión de fabtoolkit:** `1.0.0`
+**fabtoolkit version:** `1.0.0`
 
 ---
 
-## Ejemplos de uso
+## Usage examples
 
-### Ejemplo 1: Particionar una tabla por trimestre
+### Example 1: Partition a table by quarter
 
 ```json
 [
@@ -153,16 +155,16 @@ from fabtoolkit.dataset import Dataset         # Clase para operaciones sobre mo
 ]
 ```
 
-**Resultado esperado (a 27/12/2025):**
+**Expected result (as of 12/27/2025):**
 ```
 Sales_20200101_20200331  (Q1 2020)
 Sales_20200401_20200630  (Q2 2020)
 Sales_20200701_20200930  (Q3 2020)
-... (continúa hasta Q4 2025)
+... (continues up to Q4 2025)
 Sales_20251001_20251231  (Q4 2025)
 ```
 
-### Ejemplo 2: Múltiples entidades con diferentes intervalos
+### Example 2: Multiple entities with different intervals
 
 ```json
 [
@@ -185,23 +187,23 @@ Sales_20251001_20251231  (Q4 2025)
 
 ---
 
-## 📝 Notas de implementación
+## 📝 Implementation notes
 
-### Generación de intervalo de fechas
+### Date interval generation
 
-- El intervalo se calcula hasta el **último día del período para el valor de `last_date`**:
-  - Si el intervalo es `YEAR`: hasta el final del año para el valor de `last_date`.
-  - Si el intervalo es `QUARTER`: hasta el final del trimestre para el valor de `last_date`.
-  - Si el intervalo es `MONTH`: hasta el final del mes para el valor de `last_date`.
+- The interval is calculated until the **last day of the period for the `last_date` value**:
+  - If the interval is `YEAR`: until the end of the year for the `last_date` value.
+  - If the interval is `QUARTER`: until the end of the quarter for the `last_date` value.
+  - If the interval is `MONTH`: until the end of the month for the `last_date` value.
 
-### Eliminación de partición por defecto
+### Default partition deletion
 
-- Generalmente, por defecto, Power BI crea una partición que abarca todos los datos, cuyo nombre coincide con la entidad.
-- Una vez añadidas las particiones necesarias, esta partición se elimina en caso de que exista.
+- Usually, by default, Power BI creates a partition that spans all data, whose name matches the entity.
+- Once the necessary partitions have been added, this partition is deleted if it exists.
 
-### Construcción de consultas M para particiones
+### M query construction for partitions
 
-- Se preserva la consulta original (transformaciones, uniones, etc.)
-- Se agrega un paso adicional `Table.SelectRows` para filtrar por un intervalo de fechas específico.
+- The original query is preserved (transformations, joins, etc.)
+- An additional `Table.SelectRows` step is added to filter by a specific date interval.
 
 ---
