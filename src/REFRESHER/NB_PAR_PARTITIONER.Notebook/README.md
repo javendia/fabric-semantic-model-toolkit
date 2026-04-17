@@ -121,7 +121,7 @@ flowchart TD
 
 ### fabtoolkit
 
-Custom utilities toolkit to facilitate common operations in Microsoft Fabric. For more information about the bookstore, click the following [**link**](./fabtoolkit/README.md).
+Custom utilities toolkit to facilitate common operations in Microsoft Fabric. For more information about the bookstore, click the following [**link**](./../../../fabtoolkit/README.md).
 
 The notebook uses the following functions from the `fabtoolkit` library:
 
