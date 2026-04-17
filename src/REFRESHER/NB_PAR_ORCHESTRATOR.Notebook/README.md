@@ -200,7 +200,7 @@ notebook_timeout = 7200
 
 ## 🔗 Related notebooks
 
-- [**NB_PAR_PARTITIONER**](./NB_PAR_PARTITIONER.Notebook/README.md): Dynamically generates partitions based on customizable date criteria.
-- [**NB_PAR_REFRESHER**](./NB_PAR_REFRESHER.Notebook/README.md): Executes dataset refresh for a specified group of tables / partitions.
+- [**NB_PAR_PARTITIONER**](./../NB_PAR_PARTITIONER.Notebook/README.md): Dynamically generates partitions based on customizable date criteria.
+- [**NB_PAR_REFRESHER**](./../NB_PAR_REFRESHER.Notebook/README.md): Executes dataset refresh for a specified group of tables / partitions.
 
 ---
