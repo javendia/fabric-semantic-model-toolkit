@@ -63,7 +63,7 @@ For more details on each notebook, click on the corresponding links above.
 3. **(Optional)** If you want to use the partitioning and dynamic refresh utility, additional configuration is required:
 
     1. In your Fabric workspace, open the **NB_PAR_ORCHESTRATOR** notebook
-    2. Import the custom library [**fabtoolkit-1.0.0-py3-none-any.whl**](./fabtoolkit/README.md) among the notebook's built-in resources:
+    2. Import the custom library [**fabtoolkit-1.0.0-py3-none-any.whl**](./fabtoolkit/dist/) among the notebook's built-in resources:
 
 <p align="center">
     <img src="./resources/img/install-wheel.png" alt="Import custom library" style="max-width: 400px; height: auto; border-radius: 8px;">
