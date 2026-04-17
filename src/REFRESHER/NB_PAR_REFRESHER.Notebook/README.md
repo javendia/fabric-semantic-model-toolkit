@@ -118,7 +118,6 @@ flowchart TD
   style X1 fill:#FFD580,color:#000
   style I fill:#FFD580,color:#000
   style T fill:#FFD580,color:#000
-  style END fill:#FFB6C6,color:#000
   style AA fill:#FFE4B5,color:#000
   style AD fill:#FFE4B5,color:#000
 ```
