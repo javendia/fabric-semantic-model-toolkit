@@ -142,7 +142,7 @@ The notebook uses the following functions from the `fabtoolkit` library:
 from fabtoolkit.utils import (
     is_valid_text          # Validate non-empty string
 )
-from fabtoolkit.log import ConsoleFormatter    # Custom logging format
+from fabtoolkit.log import ConsoleLogFormatter    # Custom logging format
 from fabtoolkit.dataset import Dataset         # Class for operations on semantic models
 ```
 

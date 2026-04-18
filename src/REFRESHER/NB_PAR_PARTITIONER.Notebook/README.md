@@ -131,7 +131,7 @@ from fabtoolkit.utils import (
     Constants,                # Global constants (DATE_FORMAT, INTERVALS)
     Interval                  # Enum of valid intervals
 )
-from fabtoolkit.log import ConsoleFormatter    # Custom logging format
+from fabtoolkit.log import ConsoleLogFormatter    # Custom logging format
 from fabtoolkit.dataset import Dataset         # Class for operations on semantic models
 ```
 

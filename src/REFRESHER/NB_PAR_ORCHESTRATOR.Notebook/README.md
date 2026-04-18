@@ -144,7 +144,7 @@ from fabtoolkit.utils import (
     validate_json,                # Parse and validate JSON
     Constants
 )
-from fabtoolkit.log import ConsoleFormatter    # Custom logging format
+from fabtoolkit.log import ConsoleLogFormatter    # Custom logging format
 ```
 
 **fabtoolkit version:** `1.0.0`
