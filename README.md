@@ -33,6 +33,8 @@ This solution provides a framework for managing dynamic partitioning and data re
 
 For more details on each notebook, click on the corresponding links above.
 
+---
+
 ## 🗹 Prerequisites
 
 - ✅ A **Microsoft Fabric capacity** in your Azure tenant
@@ -40,6 +42,8 @@ For more details on each notebook, click on the corresponding links above.
 - ✅ **Contributor** or higher permissions in the workspace
 - ✅ [Permissions to create Fabric artifacts](https://learn.microsoft.com/en-us/fabric/admin/fabric-switch)
 - ✅ A **GitHub account** to host the repository
+
+---
 
 ## 🚀 Installation and setup
 
@@ -69,11 +73,15 @@ For more details on each notebook, click on the corresponding links above.
     <img src="./resources/img/install-wheel.png" alt="Import custom library" style="max-width: 400px; height: auto; border-radius: 8px;">
 </p>
 
+---
+
 ## 📚 Resources and documentation
 
 - [Microsoft Fabric Documentation](https://learn.microsoft.com/en-us/fabric/)
 - [SemPy](https://learn.microsoft.com/en-us/python/api/semantic-link-sempy/sempy.fabric?view=semantic-link-python)
 - [NotebookUtils](https://learn.microsoft.com/en-us/fabric/data-engineering/notebook-utilities)
+
+---
 
 ## 📜 License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
