@@ -15,7 +15,7 @@ A utility library designed to reuse common tasks when working with **Microsoft F
 
 ## Modules
 
-### dataset.py
+### [dataset.py](./fabtoolkit/dataset.py)
 Provides the `Dataset` class for programmatic interaction with Fabric semantic models.
 
 **Features:**
@@ -37,7 +37,7 @@ print(dataset.partitions)
 
 ---
 
-### log.py
+### [log.py](./fabtoolkit/log.py)
 Provides `ConsoleLogFormatter` for color-coded console logging.
 
 **Features:**
@@ -65,7 +65,7 @@ logger.error("An error occurred")
 
 ---
 
-### utils.py
+### [utils.py](./fabtoolkit/utils.py)
 Provides utility functions and constants for common operations.
 
 **Features:**
