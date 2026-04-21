@@ -39,7 +39,7 @@ For more details on each notebook, click on the corresponding links above.
 
 - ✅ A **Microsoft Fabric capacity** in your Azure tenant
 - ✅ A **Fabric workspace** assigned to the capacity
-- ✅ **Contributor** or higher permissions in the workspace
+- ✅ **Admin** permissions in the workspace
 - ✅ [Permissions to create Fabric artifacts](https://learn.microsoft.com/en-us/fabric/admin/fabric-switch)
 - ✅ A **GitHub account** to host the repository
 
