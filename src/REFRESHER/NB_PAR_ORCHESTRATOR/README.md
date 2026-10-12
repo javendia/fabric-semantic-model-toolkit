@@ -58,6 +58,7 @@ The **NB_PAR_ORCHESTRATOR** notebook is the main orchestrator of the workflow fo
 | `enable_refresh` | boolean | Enables/disables semantic model refresh | `True` / `False` |
 | `tables_to_refresh` | string | Tables to refresh (comma-separated) | `"Customer,Sales"` |
 | `partitions_to_refresh` | string (JSON) | Specific partitions to refresh | See table below |
+| `enable_referential_integrity` | boolean | Enables refreshing related tables to maintain referential integrity | `True` |
 
 **Example of `partitions_to_refresh`:**
 ```json
@@ -73,6 +74,8 @@ The **NB_PAR_ORCHESTRATOR** notebook is the main orchestrator of the workflow fo
 
 | Parameter | Type | Description | Values |
 |-----------|------|-------------|--------|
+| `refresh_mode` | string | Refresh strategy | `"custom"` or `"memory-optimized"` |
+| `refresh_type` | string | Type of refresh operation | `"full"`, `"clearValues"`, `"calculate"`, `"dataOnly"`, `"automatic"`, `"defragment"` |
 | `refresh_commit_mode` | string | Transaction confirmation | `"transactional"` (default) or `"partialBatch"` |
 | `refresh_max_parallelism` | integer | Maximum number of entities to refresh in parallel | (recommended: `4-6`) |
 | `notebook_timeout` | integer | Maximum notebook execution time in seconds | (recommended: `7200`) |
@@ -160,13 +163,16 @@ partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by
 enable_refresh = False
 ```
 
-### 2. Partition until a specific date and refresh all periods
+### 2. Partition until a specific date and refresh all objects (referential integrity enabled)
 ```python
 enable_partition = True
 partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "*"}]'
 enable_refresh = True
 tables_to_refresh = ""
 partitions_to_refresh = ""
+enable_referential_integrity = True
+refresh_mode = "custom"
+refresh_type = "full"
 refresh_commit_mode = "transactional"
 refresh_max_parallelism = 6
 notebook_timeout = 7200
@@ -179,6 +185,9 @@ partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by
 enable_refresh = True
 tables_to_refresh = "Customer,Sales"
 partitions_to_refresh = ""
+enable_referential_integrity = False
+refresh_mode = "custom"
+refresh_type = "full"
 refresh_commit_mode = "transactional"
 refresh_max_parallelism = 6
 notebook_timeout = 7200
@@ -191,16 +200,30 @@ partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by
 enable_refresh = True
 tables_to_refresh = ""
 partitions_to_refresh = '[{"table": "Sales", "selected_partitions": "Sales_20200101_20200331,Sales_20200401_20200630"}]'
+enable_referential_integrity = True
+refresh_mode = "custom"
+refresh_type = "full"
 refresh_commit_mode = "transactional"
 refresh_max_parallelism = 4
 notebook_timeout = 7200
+```
+
+### 5. Refresh with memory-optimized mode
+```python
+enable_partition = False
+partitions_config = '[{"table": "Sales", "first_date": "20200101", "partition_by": "Order Date", "interval": "QUARTER", "last_date": "20250101", "intervals_to_refresh": "*"}]'
+enable_refresh = True
+tables_to_refresh = ""
+partitions_to_refresh = ""
+enable_referential_integrity = True
+refresh_mode = "memory_optimized"
 ```
 
 ---
 
 ## 🔗 Related notebooks
 
-- [**NB_PAR_PARTITIONER**](./../NB_PAR_PARTITIONER.Notebook/README.md): Dynamically generates partitions based on customizable date criteria.
-- [**NB_PAR_REFRESHER**](./../NB_PAR_REFRESHER.Notebook/README.md): Executes dataset refresh for a specified group of tables / partitions.
+- [**NB_PAR_PARTITIONER**](./../NB_PAR_PARTITIONER/README.md): Dynamically generates partitions based on customizable date criteria.
+- [**NB_PAR_REFRESHER**](./../NB_PAR_REFRESHER/README.md): Executes dataset refresh for a specified group of tables / partitions.
 
 ---

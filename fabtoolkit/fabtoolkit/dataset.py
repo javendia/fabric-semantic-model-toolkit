@@ -161,26 +161,43 @@ class Dataset:
         if not query or not isinstance(query, str):
             raise ValueError("Query must be a non-empty string.")
 
-        # Find the 'in' keyword line
-        m = re.search(r'\n[ \t]*in[ \t]*\n', query)
-        idx = m.start()
+        # Find the final 'in' keyword
+        matches = list(re.finditer(r'(?im)^\s*in\s*$', query))
 
+        idx = matches[-1].start()
         lines = query[:idx].splitlines()
-        # Regex to identify partition definition lines. The pattern matches lines like:
-        #    TableName_YYYYMMDD_YYYYMMDD =
-        partition_line_regex = r'^\s*\w+_\d{8}_\d{8}\s*='
+
+        # Identify previously generated partition steps
+        partition_line_regex = (
+            r'^\s*(?:#")?[\w\s]+\_\d{8}\_\d{8}(?:"\s*)?='
+        )
 
         filtered_lines = []
+
         for line in lines:
             if re.match(partition_line_regex, line):
-                # Remove comma from previous line if present
-                if filtered_lines and filtered_lines[-1].endswith(','):
-                    filtered_lines[-1] = filtered_lines[-1][:-1]
+
+                # Remove trailing comma from previous step
+                if filtered_lines and filtered_lines[-1].rstrip().endswith(","):
+                    filtered_lines[-1] = filtered_lines[-1].rstrip().rstrip(",")
+
                 continue
+
             filtered_lines.append(line)
 
-        base_query = '\n'.join(filtered_lines)
-        last_step = filtered_lines[-1].lstrip().split(' ')[0]
+        base_query = "\n".join(filtered_lines).rstrip()
+
+        # Extract the last step name, including quoted M identifiers
+        last_step_regex = r'^\s*(#"(?:[^"]|"")*"|[A-Za-z_][\w]*)\s*='
+
+        last_step = None
+
+        for line in reversed(filtered_lines):
+            match = re.match(last_step_regex, line)
+
+            if match:
+                last_step = match.group(1)
+                break
 
         return base_query, last_step
 
@@ -216,7 +233,8 @@ class Dataset:
 
     def refresh_objects(
             self, 
-            df: pd.DataFrame, 
+            df: pd.DataFrame,
+            refresh_type: Optional[str] = "full", 
             commit_mode: Optional[str] = "transactional", 
             max_parallelism: Optional[int] = 4
         ) -> str:
@@ -225,6 +243,7 @@ class Dataset:
 
         Args:
             df (pd.DataFrame): DataFrame with columns: ['table', 'partition'] specifying objects to refresh.
+            refresh_type (str): Type of refresh to perform.
             commit_mode (str): Determines if objects will be committed in batches or only when complete.
             max_parallelism (int): The maximum number of threads on which to run parallel processing commands
 
@@ -247,6 +266,11 @@ class Dataset:
         if missing:
             raise ValueError(f"Missing required columns: {missing}")
         
+        # Validate refresh type
+        available_refresh_types = {"full", "clearValues", "calculate", "dataOnly", "automatic", "defragment"}
+        if refresh_type not in available_refresh_types:
+            raise ValueError(f"Invalid refresh type '{refresh_type}'. Available types: {available_refresh_types}")
+        
         # Validate commit mode
         available_commit_modes = {"transactional", "partialBatch"}
         if commit_mode not in available_commit_modes:
@@ -262,7 +286,7 @@ class Dataset:
             workspace=self.__workspace_id,
             dataset=self.__dataset_id,
             objects=objects,
-            refresh_type="full",
+            refresh_type=refresh_type,
             apply_refresh_policy=False,
             commit_mode=commit_mode,
             max_parallelism=max_parallelism
