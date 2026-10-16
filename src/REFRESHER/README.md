@@ -12,9 +12,9 @@ This framework automatically creates date-based partitions and enables granular 
 
 | Component | Description |
 |-----------|-------------|
-| [**NB_PAR_ORCHESTRATOR**](./../../src/REFRESHER/NB_PAR_ORCHESTRATOR/README.md) | Main notebook that controls the complete flow: orchestrates the partitioning and dataset refresh |
-| [**NB_PAR_PARTITIONER**](./../../src/REFRESHER/NB_PAR_PARTITIONER/README.md) | Dynamically generates partitions based on customizable date criteria |
-| [**NB_PAR_REFRESHER**](./../../src/REFRESHER/NB_PAR_REFRESHER/README.md) | Executes the dataset refresh for a specified group of tables / partitions |
+| [**NB_PAR_ORCHESTRATOR**](./../../src/REFRESHER/NB_PAR_ORCHESTRATOR.Notebook/README.md) | Main notebook that controls the complete flow: orchestrates the partitioning and dataset refresh |
+| [**NB_PAR_PARTITIONER**](./../../src/REFRESHER/NB_PAR_PARTITIONER.Notebook/README.md) | Dynamically generates partitions based on customizable date criteria |
+| [**NB_PAR_REFRESHER**](./../../src/REFRESHER/NB_PAR_REFRESHER.Notebook/README.md) | Executes the dataset refresh for a specified group of tables / partitions |
 
 Full documentation for each notebook is available by clicking on the corresponding links above.
 
