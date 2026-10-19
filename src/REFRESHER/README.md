@@ -66,7 +66,7 @@ Custom utilities toolkit to facilitate common operations in Microsoft Fabric. Fo
     2. Go to **Settings > Git integration**.
     3. Select **GitHub** as the Git provider.
     4. Connect your GitHub account and select the forked repository.
-    5. Select your desired branch (e.g., **main**) and root folder **src**.
+    5. Select your desired branch (e.g., **main**) and root folder **src/REFRESHER**.
     6. Click the **Connect and sync** button.
 
 3. **Import the fabtoolkit library**
