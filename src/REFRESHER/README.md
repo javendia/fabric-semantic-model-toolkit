@@ -3,6 +3,8 @@
 
 ## 📋 Summary
 
+![Logo](./../../resources/img/logo1.png)
+
 This framework automatically creates date-based partitions and enables granular refresh workflows, allowing you to update only changed data instead of reprocessing your entire dataset.
 
 **How it works:**
