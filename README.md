@@ -23,7 +23,7 @@ fabric-semantic-model-toolkit/
 
 ## 🛠️ Tools
 
-### [REFRESHER](./src/REFRESHER/README.md)
+### [Partition-Driven Refresh Automation](./src/REFRESHER/README.md)
 A dynamic partitioning and refresh solution for Power BI semantic models, designed to optimize data refresh processes by creating and refreshing partitions based on user-defined criteria.
 
 ---
@@ -33,6 +33,12 @@ A dynamic partitioning and refresh solution for Power BI semantic models, design
 - [Microsoft Fabric Documentation](https://learn.microsoft.com/en-us/fabric/)
 - [SemPy](https://learn.microsoft.com/en-us/python/api/semantic-link-sempy/sempy.fabric?view=semantic-link-python)
 - [NotebookUtils](https://learn.microsoft.com/en-us/fabric/data-engineering/notebook-utilities)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome. Please open an issue to discuss significant changes, then submit a pull request with a clear description of your updates. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ---
 
