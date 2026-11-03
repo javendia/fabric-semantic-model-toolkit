@@ -295,10 +295,8 @@ def run() -> None:
     if refresh_mode == "memory-optimized":
         # 1. Remove all data from specified objects
         refresh(dataset, partitions, refresh_type="clearValues")
-        # 2. Load data from the source to the specified objects
-        refresh(dataset, partitions, refresh_type="dataOnly", commit_mode="partialBatch", max_parallelism=1)
-        # 3. Perform a recalculation on the specified objects
-        refresh(dataset, partitions, refresh_type="calculate")
+        # 2. Refresh specified objects
+        refresh(dataset, partitions, refresh_type="full", commit_mode="partialBatch", max_parallelism=max_parallelism)
     else:
         refresh(dataset, partitions, refresh_type, commit_mode, max_parallelism)
 
