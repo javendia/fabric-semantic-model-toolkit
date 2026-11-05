@@ -296,50 +296,60 @@ class Dataset:
 
     def check_refresh_status(self, refresh_request_id: str, timeout: int = 7200) -> str:
         """
-        Check the status of a refresh operation with exponential decreasing backoff.
-
-        Polls the refresh status periodically with exponential decreasing backoff:
-        - Starts with 60s wait time for infrequent polling
-        - Exponentially decreases to 10s minimum for more frequent polling as time progresses
+        Monitor a semantic model refresh with retry handling.
+        
+        - Maximum timeout: 2 hours by default.
+        - Stops after 5 consecutive polling errors.
 
         Args:
-            refresh_request_id (str): The refresh request identifier to check.
-            timeout (int, optional): Maximum time to wait for completion in seconds. Defaults to 7200 (2 hours).
+            refresh_request_id (str): The refresh request identifier (UUID string).
+            timeout (int, optional): Maximum time to wait for the refresh to complete, in seconds. Defaults to 7200 (2 hours).
 
         Returns:
-            str: Final status of the refresh operation (e.g., 'Completed', 'Failed', 'Unknown').
+            str: Final status of the refresh operation.
 
         Raises:
-            TimeoutError: If refresh operation does not complete within the timeout period.
-            RuntimeError: If unable to retrieve refresh status from the API.
+            TimeoutError: If the refresh operation does not complete within the specified timeout.
+            RuntimeError: If consecutive errors occur while checking the refresh status.
         """
-        
-        start_time = time.time()
-        status = None
-        max_backoff_seconds = 60    # 60 seconds initial wait
-        min_backoff_seconds = 10    # 10 seconds minimum wait
-        total_elapsed = 0
-        
-        while total_elapsed < timeout:
+
+        start_time = time.monotonic()
+        status = "Unknown"
+        errors = 0
+
+        max_consecutive_errors = 5
+
+        while (elapsed := time.monotonic() - start_time) < timeout:
             try:
                 status = fabric.get_refresh_execution_details(
                     workspace=self.__workspace_id,
                     dataset=self.__dataset_id,
                     refresh_request_id=refresh_request_id
                 ).status
-                
+
+                errors = 0
+
                 if status != "Unknown":
                     return status
+
             except Exception as e:
-                raise RuntimeError(f"Failed to retrieve refresh status: {e}") from e
-            
-            # Exponential decreasing backoff: decay from max to min
-            elapsed_ratio = total_elapsed / timeout
-            wait_time = max(
-                min_backoff_seconds,
-                max_backoff_seconds * (2 ** (-elapsed_ratio * 3))
-            )
-            time.sleep(wait_time)
-            total_elapsed = time.time() - start_time
-        
-        raise TimeoutError(f"Refresh operation did not complete within {timeout} seconds. Last status: {status}")
+                errors += 1
+
+                if errors >= max_consecutive_errors:
+                    raise RuntimeError(
+                        f"Failed to retrieve refresh status after {max_consecutive_errors} consecutive errors. "
+                        f"Last status: {status}"
+                    ) from e
+
+            elapsed = time.monotonic() - start_time
+            remaining = timeout - elapsed
+
+            if remaining <= 0:
+                break
+
+            wait_time = max(10, 60 * 2 ** (-3 * elapsed / timeout))
+            time.sleep(min(wait_time, remaining))
+
+        raise TimeoutError(
+            f"Refresh timed out after {timeout}s. Last status: {status}"
+        )
