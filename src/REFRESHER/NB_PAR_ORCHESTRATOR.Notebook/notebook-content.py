@@ -36,14 +36,18 @@ notebook_timeout: int = 7200
 # CELL ********************
 
 from datetime import datetime
-from typing import Optional, Any, Dict
-import os
-import sys
+import fcntl
+import importlib.metadata
+import importlib.util
+from io import StringIO
 import logging
 import notebookutils
-from io import StringIO
-import uuid
 import numpy as np
+import os
+import subprocess
+import sys
+from typing import Optional, Any, Dict
+import uuid
 
 # METADATA ********************
 
@@ -82,7 +86,40 @@ wheel_path = os.path.join(
     "builtin",
     f"fabtoolkit-{FABTOOLKIT_VERSION}-py3-none-any.whl"
 )
-%pip install {wheel_path}
+
+# Shared locking between processes in the same environment
+install_dir = os.path.join(os.path.expanduser("~"), ".cache")
+os.makedirs(install_dir, exist_ok=True)
+
+install_path = os.path.join(install_dir, "fabtoolkit-install.lock")
+
+with open(install_path, "w") as lock_file:
+
+    fcntl.flock(lock_file, fcntl.LOCK_EX)
+
+    # Check if it is installed and whether it matches the expected version.
+    try:
+        installed_version = importlib.metadata.version("fabtoolkit")
+    except importlib.metadata.PackageNotFoundError:
+        installed_version = None
+
+    module_spec = importlib.util.find_spec("fabtoolkit")
+
+    if (
+        module_spec is None
+        or installed_version != FABTOOLKIT_VERSION
+    ):
+        subprocess.check_call([
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            wheel_path
+        ])
+
+    # Post-verification
+    if importlib.util.find_spec("fabtoolkit") is None:
+        raise ImportError("Failed to install fabtoolkit.")
 
 # METADATA ********************
 
